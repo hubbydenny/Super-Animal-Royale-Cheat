@@ -69,10 +69,6 @@ void HooksManager::Init(ModulesManager * modules)
 		spdlog::error("Failed to initialize MinHook. Hooks will not be initialized.");
 		return;
 	}
-
-	// LocalPlayerStart offset (0x10540D0) is WRONG - it points to a SimpleJSON method, not a player init function.
-	// Hook disabled until correct offset is found.
-	// CREATE_HOOK(LocalPlayerStart);
 	spdlog::warn("LocalPlayerStart hook DISABLED - offset 0x10540D0 is incorrect (SimpleJSON method)");
 	CREATE_HOOK(NetworkPlayerStart);
 	CREATE_HOOK(NetworkPlayerDestroy);

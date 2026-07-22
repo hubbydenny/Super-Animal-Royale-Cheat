@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Core">
+      <UniqueIdentifier>{7B5E6A12-3C8D-4F90-A1B2-C3D4E5F60001}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Core\GameStructs">
+      <UniqueIdentifier>{7B5E6A12-3C8D-4F90-A1B2-C3D4E5F60002}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Core\Modules">
+      <UniqueIdentifier>{7B5E6A12-3C8D-4F90-A1B2-C3D4E5F60003}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Core\Config">
+      <UniqueIdentifier>{7B5E6A12-3C8D-4F90-A1B2-C3D4E5F60004}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Core\Memory">
+      <UniqueIdentifier>{7B5E6A12-3C8D-4F90-A1B2-C3D4E5F60005}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Core\Math">
+      <UniqueIdentifier>{7B5E6A12-3C8D-4F90-A1B2-C3D4E5F60006}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Core\Logging">
+      <UniqueIdentifier>{7B5E6A12-3C8D-4F90-A1B2-C3D4E5F60007}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Core\Hooks">
+      <UniqueIdentifier>{7B5E6A12-3C8D-4F90-A1B2-C3D4E5F60008}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Features">
+      <UniqueIdentifier>{8C6F7B23-4D9E-5A01-B2C3-D4E5F6010001}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Features\ESP">
+      <UniqueIdentifier>{8C6F7B23-4D9E-5A01-B2C3-D4E5F6010004}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Features\Bunnyhop">
+      <UniqueIdentifier>{8C6F7B23-4D9E-5A01-B2C3-D4E5F6010005}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Features\Camera">
+      <UniqueIdentifier>{8C6F7B23-4D9E-5A01-B2C3-D4E5F6010006}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Features\Misc">
+      <UniqueIdentifier>{8C6F7B23-4D9E-5A01-B2C3-D4E5F6010007}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Features\Menu">
+      <UniqueIdentifier>{8C6F7B23-4D9E-5A01-B2C3-D4E5F6010008}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Features\Aimbot">
+      <UniqueIdentifier>{8C6F7B23-4D9E-5A01-B2C3-D4E5F6010009}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Features\Menu\fonts">
+      <UniqueIdentifier>{8C6F7B23-4D9E-5A01-B2C3-D4E5F6010010}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Deps">
+      <UniqueIdentifier>{9D7E8C34-5FA0-6B12-C3D4-E5F601020001}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Deps\MinHook">
+      <UniqueIdentifier>{9D7E8C34-5FA0-6B12-C3D4-E5F601020002}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Deps\MinHook\src">
+      <UniqueIdentifier>{9D7E8C34-5FA0-6B12-C3D4-E5F601020003}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Deps\MinHook\src\hde">
+      <UniqueIdentifier>{9D7E8C34-5FA0-6B12-C3D4-E5F601020004}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Deps\MinHook\include">
+      <UniqueIdentifier>{9D7E8C34-5FA0-6B12-C3D4-E5F601020005}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Deps\ImGui">
+      <UniqueIdentifier>{9D7E8C34-5FA0-6B12-C3D4-E5F601020006}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Features\Menu\Fonts">
+      <UniqueIdentifier>{ae3c010b-e12c-4a3d-badb-8f5ab173b5de}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\DllMain.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\main.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\App.cpp">
+      <Filter>Source\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Modules\ModulesManager.cpp">
+      <Filter>Source\Core\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Memory\NopBuffer.cpp">
+      <Filter>Source\Core\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Memory\PatternScanner.cpp">
+      <Filter>Source\Core\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Logging\LogManager.cpp">
+      <Filter>Source\Core\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Hooks\HooksManager.cpp">
+      <Filter>Source\Core\Hooks</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Features\ESP\EspModule.cpp">
+      <Filter>Source\Features\ESP</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Features\Bunnyhop\Bunnyhop.cpp">
+      <Filter>Source\Features\Bunnyhop</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Features\Camera\CameraModule.cpp">
+      <Filter>Source\Features\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Features\Misc\Misc.cpp">
+      <Filter>Source\Features\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Features\Menu\Menu.cpp">
+      <Filter>Source\Features\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Features\Aimbot\Aimbot.cpp">
+      <Filter>Source\Features\Aimbot</Filter>
+    </ClCompile>
+    <ClCompile Include="Deps\MinHook\src\buffer.c">
+      <Filter>Deps\MinHook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Deps\MinHook\src\hook.c">
+      <Filter>Deps\MinHook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Deps\MinHook\src\trampoline.c">
+      <Filter>Deps\MinHook\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Deps\MinHook\src\hde\hde32.c">
+      <Filter>Deps\MinHook\src\hde</Filter>
+    </ClCompile>
+    <ClCompile Include="Deps\MinHook\src\hde\hde64.c">
+      <Filter>Deps\MinHook\src\hde</Filter>
+    </ClCompile>
+    <ClCompile Include="Deps\ImGui\imgui.cpp">
+      <Filter>Deps\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Deps\ImGui\imgui_demo.cpp">
+      <Filter>Deps\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Deps\ImGui\imgui_draw.cpp">
+      <Filter>Deps\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Deps\ImGui\imgui_impl_dx11.cpp">
+      <Filter>Deps\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Deps\ImGui\imgui_impl_win32.cpp">
+      <Filter>Deps\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Deps\ImGui\imgui_stdlib.cpp">
+      <Filter>Deps\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Deps\ImGui\imgui_tables.cpp">
+      <Filter>Deps\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Deps\ImGui\imgui_widgets.cpp">
+      <Filter>Deps\ImGui</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\main.hpp">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\App.hpp">
+      <Filter>Source\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\GameStructs\GameStructs.hpp">
+      <Filter>Source\Core\GameStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Modules\ModulesManager.hpp">
+      <Filter>Source\Core\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Modules\ModuleBase.hpp">
+      <Filter>Source\Core\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Config\Config.hpp">
+      <Filter>Source\Core\Config</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Memory\NopBuffer.hpp">
+      <Filter>Source\Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Math\Vectors.hpp">
+      <Filter>Source\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Math\Utils.hpp">
+      <Filter>Source\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Logging\LogManager.hpp">
+      <Filter>Source\Core\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Hooks\HooksManager.hpp">
+      <Filter>Source\Core\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Hooks\HooksImplementations.hpp">
+      <Filter>Source\Core\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Hooks\HooksDefinitions.hpp">
+      <Filter>Source\Core\Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Features\ESP\EspModule.hpp">
+      <Filter>Source\Features\ESP</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Features\Bunnyhop\Bunnyhop.hpp">
+      <Filter>Source\Features\Bunnyhop</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Features\Camera\CameraModule.hpp">
+      <Filter>Source\Features\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Features\Misc\Misc.hpp">
+      <Filter>Source\Features\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Features\Menu\Menu.hpp">
+      <Filter>Source\Features\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Features\Aimbot\Aimbot.hpp">
+      <Filter>Source\Features\Aimbot</Filter>
+    </ClInclude>
+    <ClInclude Include="Deps\MinHook\include\MinHook.h">
+      <Filter>Deps\MinHook\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Deps\MinHook\src\buffer.h">
+      <Filter>Deps\MinHook\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Deps\MinHook\src\trampoline.h">
+      <Filter>Deps\MinHook\src</Filter>
+    </ClInclude>
+    <ClInclude Include="Deps\MinHook\src\hde\hde32.h">
+      <Filter>Deps\MinHook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="Deps\MinHook\src\hde\hde64.h">
+      <Filter>Deps\MinHook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="Deps\MinHook\src\hde\pstdint.h">
+      <Filter>Deps\MinHook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="Deps\MinHook\src\hde\table32.h">
+      <Filter>Deps\MinHook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="Deps\MinHook\src\hde\table64.h">
+      <Filter>Deps\MinHook\src\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="Deps\ImGui\imconfig.h">
+      <Filter>Deps\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Deps\ImGui\imgui.h">
+      <Filter>Deps\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Deps\ImGui\imgui_impl_dx11.h">
+      <Filter>Deps\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Deps\ImGui\imgui_impl_win32.h">
+      <Filter>Deps\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Deps\ImGui\imgui_internal.h">
+      <Filter>Deps\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Deps\ImGui\imgui_stdlib.h">
+      <Filter>Deps\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Deps\ImGui\imstb_rectpack.h">
+      <Filter>Deps\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Deps\ImGui\imstb_textedit.h">
+      <Filter>Deps\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Deps\ImGui\imstb_truetype.h">
+      <Filter>Deps\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Features\Menu\fonts\RubikFont.h">
+      <Filter>Source\Features\Menu\fonts</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="todolist.md" />
+  </ItemGroup>
+</Project>

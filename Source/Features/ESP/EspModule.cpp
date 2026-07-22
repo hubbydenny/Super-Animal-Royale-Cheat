@@ -20,34 +20,35 @@ void EspModule::DrawNames()
 	if (!cfg.bEsp || !cfg.bNames) return;
 	const auto& ctx = hooks->GetGameContext();
 
-	float cx = ImGui::GetIO().DisplaySize.x * 0.5f;
-	float cy = ImGui::GetIO().DisplaySize.y * 0.5f;
-	ImDrawList* dl = ImGui::GetBackgroundDrawList();
-	if (!dl) return;
+	float ScreenX = ImGui::GetIO().DisplaySize.x;
+	float ScreenY = ImGui::GetIO().DisplaySize.y;
 
+	ImDrawList* dl = ImGui::GetForegroundDrawList();
+	if (!dl) return;
 	NetworkPlayer* localNet = nullptr;
+	std::vector<NetworkPlayer*> snapshot;
 	{
 		std::lock_guard<std::mutex> lock(ctx.mtx);
 		if (!ctx.localPlayer || !ctx.localPlayer->player) return;
 		localNet = ctx.localPlayer->player;
-	}
-	if (!localNet) return;
-
-	float nameRadius = cfg.fArrowsRadius + 50.0f;
-
-	std::vector<NetworkPlayer*> snapshot;
-	{
-		std::lock_guard<std::mutex> lock(ctx.mtx);
 		snapshot.assign(ctx.players.begin(), ctx.players.end());
 	}
-
+	if (!localNet || snapshot.empty()) return;
 	for (auto* target : snapshot)
 	{
 		if (!target || target == localNet || target->playerIsDead) continue;
 
+		float orthoSize = ctx.localPlayer->player->gameCamera->mainOrthoSize;
+		float pixelsPerUnit = ScreenY / (orthoSize * 2);
+		float cx = ScreenX * 0.5f;
+		float cy = ScreenY * 0.5f;
 		float dx = target->previousPosition.x - localNet->previousPosition.x;
 		float dy = target->previousPosition.y - localNet->previousPosition.y;
+		float screenX = cx + dx * pixelsPerUnit;
+		float screenY = cy - dy * pixelsPerUnit;
 		float dist = std::sqrtf(dx * dx + dy * dy);
+		float TextY = 3.0f * pixelsPerUnit;
+		float TextX = 0.0 * pixelsPerUnit;
 		if (dist < 0.1f) continue;
 
 		wchar_t* wName = (wchar_t*)((char*)target->playerName + 0x14);
@@ -59,18 +60,14 @@ void EspModule::DrawNames()
 			narrow[i] = (char)wName[i];
 		narrow[i] = '\0';
 
-		float angle = std::atan2f(dy, dx);
-		float nx = cx + std::cosf(angle) * nameRadius;
-		float ny = cy - std::sinf(angle) * nameRadius;
-
 		ImVec2 textSize = ImGui::CalcTextSize(narrow);
-		dl->AddText(ImVec2(nx - textSize.x * 0.5f, ny - 8.0f),
+		dl->AddText(ImVec2(dx - TextX * 0.5f, TextY - 8.0f),
 			IM_COL32(255, 255, 255, 255), narrow);
 
-		char hpBuf[32];
-		snprintf(hpBuf, sizeof(hpBuf), "%.0f", target->playerHP);
-		dl->AddText(ImVec2(nx - 8.0f, ny + 8.0f),
-			IM_COL32(0, 255, 0, 200), hpBuf);
+	//	char hpBuf[32];
+	//	snprintf(hpBuf, sizeof(hpBuf), "%.0f", target->playerHP);
+	//	dl->AddText(ImVec2(dx - 8.0f, dy + 8.0f),
+		//	IM_COL32(0, 255, 0, 200), hpBuf);
 	}
 }
 //void EspModule::DrawHealth() {
@@ -129,12 +126,10 @@ void EspModule::DrawArrows()
 
 		dl->AddLine(ImVec2(tipX, tipY), ImVec2(tipX + std::cosf(pa - ha) * HL, tipY - std::sinf(pa - ha) * HL), color, cfg.fArrowThickness);
 		dl->AddLine(ImVec2(tipX, tipY), ImVec2(tipX + std::cosf(pa + ha) * HL, tipY - std::sinf(pa + ha) * HL), color, cfg.fArrowThickness);
+		if (cfg.bCircle) return;
+			dl->AddCircle(ImVec2(cx, cy), R, IM_COL32(255, 255, 255, 80), 64, 1.0f);
 	}
-
-	if (cfg.bCircle)
-		dl->AddCircle(ImVec2(cx, cy), R, IM_COL32(255, 255, 255, 80), 64, 1.0f);
 }
-
 void EspModule::DrawSnaplines()
 {
 	if (!cfg.bEsp || !cfg.bSnaplines) return;

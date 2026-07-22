@@ -1,13 +1,15 @@
 #include "Menu.hpp"
 #include <imgui.h>
 #include <vector>
+#include <Windows.h>
 
 
 static int g_activeTab = 0;
-constexpr int TAB_VISUALS = 0;
+constexpr int TAB_VISUALS = 3;
 constexpr int TAB_PLAYERS = 1;
 constexpr int TAB_MISC    = 2;
-constexpr int TAB_CONFIG  = 3;
+constexpr int TAB_AIMBOT  = 0;
+constexpr int TAB_CONFIG  = 4;
 constexpr ImVec4 AccentColor = { 165, 233, 100, 255 };
 
 static void DrawTabButton(const char* label, int tab_id)
@@ -39,7 +41,19 @@ static void DrawTabVisuals(Config& cfg)
 			ImGui::Checkbox("Arrows", &cfg.bArrows);
 			ImGui::Checkbox("Names", &cfg.bNames);
 			ImGui::Checkbox("Circle", &cfg.bCircle);
-
+			ImGui::Checkbox("##zoom", &cfg.bZoomOverride);
+			ImGui::SameLine();
+			ImGui::Text("Zoom Override");
+			if (cfg.bZoomOverride)
+			{
+				ImGui::Indent(24.0f);
+				ImGui::PushItemWidth(200.0f);
+				ImGui::SliderFloat("##zoomval", &cfg.fZoomOverrideValue, 67.5f, 400.0f, "%.1f");
+				ImGui::PopItemWidth();
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Player Fov");
+				ImGui::Unindent(24.0f);
+			}
 			if (cfg.bArrows || cfg.bSnaplines)
 			{
 				ImGui::PushItemWidth(200.0f);
@@ -71,19 +85,6 @@ static void DrawTabVisuals(Config& cfg)
 		ImGui::EndChild();
 	}
 	ImGui::Spacing();
-	ImGui::Checkbox("##zoom", &cfg.bZoomOverride);
-	ImGui::SameLine();
-	ImGui::Text("Zoom Override");
-	if (cfg.bZoomOverride)
-	{
-		ImGui::Indent(24.0f);
-		ImGui::PushItemWidth(200.0f);
-		ImGui::SliderFloat("##zoomval", &cfg.fZoomOverrideValue, 67.5f, 400.0f, "%.1f");
-		ImGui::PopItemWidth();
-		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip("Player Fov");
-		ImGui::Unindent(24.0f);
-	}
 }
 
 static void DrawTabPlayers(GameContext& ctx)
@@ -143,6 +144,129 @@ static void DrawTabPlayers(GameContext& ctx)
 		}
 	}
 	ImGui::EndChild();
+}
+
+static const char* GetKeyName(int vk)
+{
+	switch (vk)
+	{
+	case VK_LBUTTON: return "LMB";
+	case VK_RBUTTON: return "RMB";
+	case VK_MBUTTON: return "MMB";
+	case VK_XBUTTON1: return "Mouse4";
+	case VK_XBUTTON2: return "Mouse5";
+	case VK_LSHIFT: return "LShift";
+	case VK_RSHIFT: return "RShift";
+	case VK_LCONTROL: return "LCtrl";
+	case VK_RCONTROL: return "RCtrl";
+	case VK_LMENU: return "LAlt";
+	case VK_RMENU: return "RAlt";
+	case VK_SPACE: return "Space";
+	case VK_TAB: return "Tab";
+	case VK_CAPITAL: return "CapsLock";
+	case VK_RETURN: return "Enter";
+	case VK_BACK: return "Backspace";
+	case VK_ESCAPE: return "Escape";
+	case VK_F1: return "F1";
+	case VK_F2: return "F2";
+	case VK_F3: return "F3";
+	case VK_F4: return "F4";
+	case VK_F5: return "F5";
+	case VK_F6: return "F6";
+	case VK_F7: return "F7";
+	case VK_F8: return "F8";
+	case VK_F9: return "F9";
+	case VK_F10: return "F10";
+	case VK_F11: return "F11";
+	case VK_F12: return "F12";
+	case 0x57: return "W";
+	case 0x41: return "A";
+	case 0x53: return "S";
+	case 0x44: return "D";
+	case 0x51: return "Q";
+	case 0x45: return "E";
+	case 0x52: return "R";
+	case 0x46: return "F";
+	case 0x5A: return "Z";
+	case 0x58: return "X";
+	case 0x43: return "C";
+	case 0x56: return "V";
+	default: return "???";
+	}
+}
+
+static void DrawTabAimbot(Config& cfg)
+{
+	ImGui::Checkbox("##aimbot_en", &cfg.bAimbot);
+	ImGui::SameLine();
+	ImGui::Text("Enable Aimbot");
+
+	if (cfg.bAimbot)
+	{
+		ImGui::Indent(24.0f);
+
+		ImGui::Checkbox("FOV Circle", &cfg.bAimFovCircle);
+		ImGui::PushItemWidth(200.0f);
+		ImGui::SliderFloat("##aimfov", &cfg.fAimFov, 10.0f, 500.0f, "%.0f");
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Aimbot FOV radius");
+		ImGui::PopItemWidth();
+
+		const char* modeNames[] = { "Hold", "Toggle", "Always On" };
+
+		static bool waitingForKey = false;
+
+		if (waitingForKey)
+		{
+			ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Press any key...");
+
+			for (int vk = 2; vk < 256; vk++)
+			{
+				if (vk == VK_ESCAPE)
+				{
+					if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
+						waitingForKey = false;
+					continue;
+				}
+				if (GetAsyncKeyState(vk) & 0x8000)
+				{
+					cfg.iAimKey = vk;
+					waitingForKey = false;
+					break;
+				}
+			}
+		}
+		else
+		{
+			const char* keyName = GetKeyName(cfg.iAimKey);
+			char keyBuf[64];
+			snprintf(keyBuf, sizeof(keyBuf), "[%s] - %s", keyName, modeNames[cfg.iAimMode]);
+
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.15f, 0.15f, 0.18f, 1.0f));
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.25f, 0.25f, 0.30f, 1.0f));
+			ImGui::Button(keyBuf, ImVec2(200.0f, 24.0f));
+			ImGui::PopStyleColor(2);
+
+			if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
+				waitingForKey = true;
+
+			if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+				ImGui::OpenPopup("##aim_mode_popup");
+
+			if (ImGui::BeginPopup("##aim_mode_popup"))
+			{
+				for (int i = 0; i < 3; i++)
+				{
+					bool selected = (cfg.iAimMode == i);
+					if (ImGui::Selectable(modeNames[i], selected))
+						cfg.iAimMode = i;
+				}
+				ImGui::EndPopup();
+			}
+		}
+
+		ImGui::Unindent(24.0f);
+	}
 }
 
 static void DrawTabMisc(Config& cfg)
@@ -216,6 +340,7 @@ void DrawMenu(Config& cfg, GameContext& ctx, bool menuOpen)
 		DrawTabButton("Visuals", TAB_VISUALS);
 		DrawTabButton("Players List", TAB_PLAYERS);
 		DrawTabButton("Misc", TAB_MISC);
+		DrawTabButton("Aimbot", TAB_AIMBOT);
 		DrawTabButton("Config", TAB_CONFIG);
 
 		ImGui::PopStyleVar(2);
@@ -230,6 +355,8 @@ void DrawMenu(Config& cfg, GameContext& ctx, bool menuOpen)
 			DrawTabPlayers(ctx);
 		else if (g_activeTab == TAB_MISC)
 			DrawTabMisc(cfg);
+		else if (g_activeTab == TAB_AIMBOT)
+			DrawTabAimbot(cfg);
 		else if (g_activeTab == TAB_CONFIG)
 			DrawTabConfig(cfg);
 

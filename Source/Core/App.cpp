@@ -1,11 +1,10 @@
-#include "App.hpp"
+﻿#include "App.hpp"
 #include <Windows.h>
 #include <spdlog/spdlog.h>
-
-// Features
 #include "../Features/ESP/EspModule.hpp"
 #include "../Features/Camera/CameraModule.hpp"
 #include "../Features/Bunnyhop/Bunnyhop.hpp"
+#include "../Features/Aimbot/Aimbot.hpp"
 #include "../Features/Misc/Misc.hpp"
 
 App::App()
@@ -26,6 +25,7 @@ void App::AddModules()
 	m_modules.AddModule<EspModule>();
 	m_modules.AddModule<CameraModule>();
 	m_modules.AddModule<BunnyhopModule>();
+	m_modules.AddModule<AimbotModule>();
 	m_modules.AddModule<MiscModule>();
 }
 

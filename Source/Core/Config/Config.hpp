@@ -18,6 +18,11 @@ struct Config
 	bool bSnaplines = false;
 	bool bLines = false;
 	bool bNames = false;
+	bool bAimbot = false;
+	bool bAimFovCircle = true;
+	float fAimFov = 90.0f;
+	int iAimKey = 0x02;
+	int iAimMode = 0;
     const float fZoomDefaultValue = 67.5f;
 	float fZoomOverrideValue = fZoomDefaultValue;
 	float fArrowsRadius = 80.0f;
@@ -47,6 +52,11 @@ struct Config
 		bCircle,
 		bSnaplines,
 		bLines,
-		bNames
+		bNames,
+		bAimbot,
+		bAimFovCircle,
+		fAimFov,
+		iAimKey,
+		iAimMode
 	);
 };
