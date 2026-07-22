@@ -20,12 +20,18 @@ struct Config
 	bool bNames = false;
     const float fZoomDefaultValue = 67.5f;
 	float fZoomOverrideValue = fZoomDefaultValue;
+	float fArrowsRadius = 80.0f;
+	float fArrowThickness = 2.0f;
+	float fSnaplineLength = 400.0f;
 	float fNearSnaplineRenderDistance = 200.0f;
 	float fMaxSnaplineRenderDistance = 500.0f;
 
 
 	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
 		Config,
+		fArrowsRadius,
+		fArrowThickness,
+		fSnaplineLength,
 		fNearSnaplineRenderDistance,
 		fMaxSnaplineRenderDistance,
 		fZoomOverrideValue,

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <ProjectGuid>{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}</ProjectGuid>
+    <RootNamespace>SuperAnimalHack</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetName>$(ProjectName)</TargetName>
+    <TargetExt>.dll</TargetExt>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)obj\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetName>$(ProjectName)</TargetName>
+    <TargetExt>.dll</TargetExt>
+    <OutDir>$(SolutionDir)bin\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)obj\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)Source;$(ProjectDir)Deps\MinHook\include;$(ProjectDir)Deps\ImGui;$(ProjectDir)Deps\spdlog\include;$(ProjectDir)Deps\json-develop\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)Source;$(ProjectDir)Deps\MinHook\include;$(ProjectDir)Deps\ImGui;$(ProjectDir)Deps\spdlog\include;$(ProjectDir)Deps\json-develop\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>MaxSpeed</Optimization>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Features\Aimbot\Aimbot.cpp" />
+    <ClCompile Include="Source\DllMain.cpp" />
+    <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\Core\App.cpp" />
+    <ClCompile Include="Source\Features\Menu\Menu.cpp" />
+    <ClCompile Include="Source\Core\Modules\ModulesManager.cpp" />
+    <ClCompile Include="Source\Core\Memory\NopBuffer.cpp" />
+    <ClCompile Include="Source\Core\Memory\PatternScanner.cpp" />
+    <ClCompile Include="Source\Core\Logging\LogManager.cpp" />
+    <ClCompile Include="Source\Core\Hooks\HooksManager.cpp" />
+    <ClCompile Include="Source\Features\ESP\EspModule.cpp" />
+    <ClCompile Include="Source\Features\Bunnyhop\Bunnyhop.cpp" />
+    <ClCompile Include="Source\Features\Camera\CameraModule.cpp" />
+    <ClCompile Include="Source\Features\Misc\Misc.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Features\Menu\fonts\RubikFont.h" />
+    <ClInclude Include="Source\main.hpp" />
+    <ClInclude Include="Source\Core\App.hpp" />
+    <ClInclude Include="Source\Core\GameStructs\GameStructs.hpp" />
+    <ClInclude Include="Source\Features\Aimbot\Aimbot.hpp" />
+    <ClInclude Include="Source\Features\Menu\Menu.hpp" />
+    <ClInclude Include="Source\Core\Modules\ModulesManager.hpp" />
+    <ClInclude Include="Source\Core\Modules\ModuleBase.hpp" />
+    <ClInclude Include="Source\Core\Config\Config.hpp" />
+    <ClInclude Include="Source\Core\Memory\NopBuffer.hpp" />
+    <ClInclude Include="Source\Core\Math\Vectors.hpp" />
+    <ClInclude Include="Source\Core\Math\Utils.hpp" />
+    <ClInclude Include="Source\Core\Logging\LogManager.hpp" />
+    <ClInclude Include="Source\Core\Hooks\HooksManager.hpp" />
+    <ClInclude Include="Source\Core\Hooks\HooksImplementations.hpp" />
+    <ClInclude Include="Source\Core\Hooks\HooksDefinitions.hpp" />
+    <ClInclude Include="Source\Features\ESP\EspModule.hpp" />
+    <ClInclude Include="Source\Features\Bunnyhop\Bunnyhop.hpp" />
+    <ClInclude Include="Source\Features\Camera\CameraModule.hpp" />
+    <ClInclude Include="Source\Features\Misc\Misc.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Deps\MinHook\src\buffer.c" />
+    <ClCompile Include="Deps\MinHook\src\hook.c" />
+    <ClCompile Include="Deps\MinHook\src\trampoline.c" />
+    <ClCompile Include="Deps\MinHook\src\hde\hde32.c" />
+    <ClCompile Include="Deps\MinHook\src\hde\hde64.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Deps\MinHook\include\MinHook.h" />
+    <ClInclude Include="Deps\MinHook\src\buffer.h" />
+    <ClInclude Include="Deps\MinHook\src\trampoline.h" />
+    <ClInclude Include="Deps\MinHook\src\hde\hde32.h" />
+    <ClInclude Include="Deps\MinHook\src\hde\hde64.h" />
+    <ClInclude Include="Deps\MinHook\src\hde\pstdint.h" />
+    <ClInclude Include="Deps\MinHook\src\hde\table32.h" />
+    <ClInclude Include="Deps\MinHook\src\hde\table64.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Deps\ImGui\imgui.cpp" />
+    <ClCompile Include="Deps\ImGui\imgui_demo.cpp" />
+    <ClCompile Include="Deps\ImGui\imgui_draw.cpp" />
+    <ClCompile Include="Deps\ImGui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="Deps\ImGui\imgui_impl_win32.cpp" />
+    <ClCompile Include="Deps\ImGui\imgui_stdlib.cpp" />
+    <ClCompile Include="Deps\ImGui\imgui_tables.cpp" />
+    <ClCompile Include="Deps\ImGui\imgui_widgets.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Deps\ImGui\imconfig.h" />
+    <ClInclude Include="Deps\ImGui\imgui.h" />
+    <ClInclude Include="Deps\ImGui\imgui_impl_dx11.h" />
+    <ClInclude Include="Deps\ImGui\imgui_impl_win32.h" />
+    <ClInclude Include="Deps\ImGui\imgui_internal.h" />
+    <ClInclude Include="Deps\ImGui\imgui_stdlib.h" />
+    <ClInclude Include="Deps\ImGui\imstb_rectpack.h" />
+    <ClInclude Include="Deps\ImGui\imstb_textedit.h" />
+    <ClInclude Include="Deps\ImGui\imstb_truetype.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

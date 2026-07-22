@@ -31,28 +31,44 @@ static void DrawTabVisuals(Config& cfg)
 	
 	if (cfg.bEsp)
 	{
-		ImGui::Indent(24.0f);
-		ImGui::Checkbox("Boxes", &cfg.bBoxes);
-		ImGui::Checkbox("Snap Lines", &cfg.bSnaplines);
-		ImGui::Checkbox("Arrows", &cfg.bArrows);
-		ImGui::Checkbox("Names", &cfg.bNames);
-		ImGui::Checkbox("Health Bar", &cfg.bHealthBar);
-		ImGui::Checkbox("Armor Bar", &cfg.bArmorBar);
-		ImGui::Checkbox("Circle", &cfg.bCircle);
-
-		if (cfg.bArrows)
+		if (ImGui::BeginChild("##visuals_scroll", ImVec2(0, 0), ImGuiChildFlags_None, ImGuiWindowFlags_NoBackground))
 		{
-			ImGui::PushItemWidth(200.0f);
-			ImGui::SliderFloat("##snapmax", &cfg.fMaxSnaplineRenderDistance, 0.0f, 5000.0f, "%.f");
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Max snapline render distance");
+			ImGui::Indent(24.0f);
+			ImGui::Checkbox("Boxes", &cfg.bBoxes);
+			ImGui::Checkbox("Snap Lines", &cfg.bSnaplines);
+			ImGui::Checkbox("Arrows", &cfg.bArrows);
+			ImGui::Checkbox("Names", &cfg.bNames);
+			ImGui::Checkbox("Circle", &cfg.bCircle);
 
-			ImGui::SliderFloat("##snapnear", &cfg.fNearSnaplineRenderDistance, 0.0f, 5000.0f, "%.f");
-			if (ImGui::IsItemHovered())
-				ImGui::SetTooltip("Near snapline render distance");
-			ImGui::PopItemWidth();
+			if (cfg.bArrows || cfg.bSnaplines)
+			{
+				ImGui::PushItemWidth(200.0f);
+				if (cfg.bArrows)
+				{
+					ImGui::SliderFloat("##arrowsradius", &cfg.fArrowsRadius, 30.0f, 300.0f, "%.0f");
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip("Arrows / Names radius");
+					ImGui::SliderFloat("##arrowthick", &cfg.fArrowThickness, 1.0f, 5.0f, "%.1f");
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip("Arrow line thickness");
+				}
+				if (cfg.bSnaplines)
+				{
+					ImGui::SliderFloat("##snaplen", &cfg.fSnaplineLength, 50.0f, 1500.0f, "%.0f");
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip("Snapline length");
+				}
+				ImGui::SliderFloat("##snapmax", &cfg.fMaxSnaplineRenderDistance, 0.0f, 5000.0f, "%.f");
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Max render distance");
+				ImGui::SliderFloat("##snapnear", &cfg.fNearSnaplineRenderDistance, 0.0f, 5000.0f, "%.f");
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Near render distance");
+				ImGui::PopItemWidth();
+			}
+			ImGui::Unindent(24.0f);
 		}
-		ImGui::Unindent(24.0f);
+		ImGui::EndChild();
 	}
 	ImGui::Spacing();
 	ImGui::Checkbox("##zoom", &cfg.bZoomOverride);

@@ -187,14 +187,15 @@ HRESULT __stdcall HooksDefinitions::HkSwapChainPresent(IDXGISwapChain* pSwapChai
 						pc = gpCtx->players.size();
 						if (lp) cam = lp->camera;
 					}
-					char buf[256];
-					snprintf(buf, sizeof(buf),
-						"local: %s | cam: %s | players: %zu | esp: %s",
-						lp ? "OK" : "NULL",
-						cam ? "OK" : "NULL",
-						pc,
-						cfg.bEsp ? "ON" : "OFF");
-					dbgDl->AddText(ImVec2(8.0f, 8.0f), IM_COL32(255, 255, 0, 255), buf);
+					
+					//char buf[256];
+				//	snprintf(buf, sizeof(buf),
+					//	"local: %s | cam: %s | players: %zu | esp: %s",
+					//	lp ? "OK" : "NULL",
+						//cam ? "OK" : "NULL",
+						//pc,
+						//cfg.bEsp ? "ON" : "OFF");
+				//	dbgDl->AddText(ImVec2(8.0f, 8.0f), IM_COL32(255, 255, 0, 255), buf);
 				}
 			}
 			//draw func
