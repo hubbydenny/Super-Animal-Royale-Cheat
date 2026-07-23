@@ -76,6 +76,14 @@ void HooksManager::Init(ModulesManager * modules)
 	CREATE_HOOK_2(ResizeBuffers);
 	CREATE_HOOK_2(SetFullscreenState);
 
+	auto pGetCursorPos = GetProcAddress(GetModuleHandleA("user32.dll"), "GetCursorPos");
+	if (pGetCursorPos)
+	{
+		mh_status = MH_CreateHook(pGetCursorPos, &HkGetCursorPos, reinterpret_cast<LPVOID*>(&oGetCursorPos));
+		if (mh_status != MH_OK)
+			spdlog::error("Fail while creating GetCursorPos hook: {}", MH_StatusToString(mh_status));
+	}
+
 #ifdef _DEBUG
 	spdlog::debug("All hooks initialized.");
 #endif

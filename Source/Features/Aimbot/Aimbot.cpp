@@ -1,5 +1,6 @@
 ﻿#include "Aimbot.hpp"
 #include "../../Core/Hooks/HooksManager.hpp"
+#include "../../Core/Hooks/HooksDefinitions.hpp"
 #include "../../Core/GameStructs/GameStructs.hpp"
 #include <cmath>
 #include <Windows.h>
@@ -11,7 +12,18 @@ AimbotModule::AimbotModule(ModulesManager* const modules, HooksManager* const ho
 
 void AimbotModule::Run()
 {
-	if (!cfg.bAimbot) return;
+	if (!cfg.bAimbot)
+	{
+		HooksDefinitions::g_hasAimTarget = false;
+		return;
+	}
+
+	bool keyPressed = (GetAsyncKeyState(cfg.iAimKey) & 0x8000) != 0;
+	if (!keyPressed && cfg.iAimMode == 0)
+	{
+		HooksDefinitions::g_hasAimTarget = false;
+		return;
+	}
 
 	const auto& ctx = hooks->GetGameContext();
 
@@ -20,15 +32,20 @@ void AimbotModule::Run()
 
 	{
 		std::lock_guard<std::mutex> lock(ctx.mtx);
-		if (!ctx.localPlayer || !ctx.localPlayer->player) return;
+		if (!ctx.localPlayer || !ctx.localPlayer->player)
+		{
+			HooksDefinitions::g_hasAimTarget = false;
+			return;
+		}
 		localNet = ctx.localPlayer->player;
 		snapshot.assign(ctx.players.begin(), ctx.players.end());
 	}
 
-	if (!localNet || snapshot.empty()) return;
-
-	bool keyPressed = (GetAsyncKeyState(cfg.iAimKey) & 0x8000) != 0;
-	if (!keyPressed && cfg.iAimMode == 0) return;
+	if (!localNet || snapshot.empty())
+	{
+		HooksDefinitions::g_hasAimTarget = false;
+		return;
+	}
 
 	float bestDist = 999999.0f;
 	NetworkPlayer* bestTarget = nullptr;
@@ -48,14 +65,22 @@ void AimbotModule::Run()
 		}
 	}
 
-	if (!bestTarget) return;
+	if (!bestTarget)
+	{
+		HooksDefinitions::g_hasAimTarget = false;
+		return;
+	}
 
 	float dx = bestTarget->previousPosition.x - localNet->previousPosition.x;
 	float dy = bestTarget->previousPosition.y - localNet->previousPosition.y;
 	float angle = std::atan2f(dy, dx);
 
 	HWND hwnd = hooks->GetGraphicsContext().hwnd;
-	if (!hwnd) return;
+	if (!hwnd)
+	{
+		HooksDefinitions::g_hasAimTarget = false;
+		return;
+	}
 
 	RECT rect;
 	GetWindowRect(hwnd, &rect);
@@ -63,8 +88,7 @@ void AimbotModule::Run()
 	float cy = (rect.top + rect.bottom) * 0.5f;
 
 	float aimDist = 200.0f;
-	float targetX = cx + std::cosf(angle) * aimDist;
-	float targetY = cy - std::sinf(angle) * aimDist;
-
-	SetCursorPos((int)targetX, (int)targetY);
+	HooksDefinitions::g_aimTarget.x = (LONG)(cx + std::cosf(angle) * aimDist);
+	HooksDefinitions::g_aimTarget.y = (LONG)(cy - std::sinf(angle) * aimDist);
+	HooksDefinitions::g_hasAimTarget = true;
 }

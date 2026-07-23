@@ -25,6 +25,10 @@ namespace HooksDefinitions
 	inline T_LocalPlayerStart pLocalPlayerStart = nullptr;
 	inline T_LocalPlayerStart oLocalPlayerStart = nullptr;
 	inline WNDPROC oWndProc = nullptr;
+
+	inline BOOL(__stdcall* oGetCursorPos)(LPPOINT lpPoint) = nullptr;
+	inline POINT g_aimTarget = { 0, 0 };
+	inline bool g_hasAimTarget = false;
 	
 	constexpr const char* ASSEMBLY_NAME = "GameAssembly.dll";
 
@@ -46,6 +50,7 @@ namespace HooksDefinitions
 	LRESULT APIENTRY HkWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	void __fastcall HkNetworkPlayerDestroy(void* pNetworkPlayer);
 	void __fastcall HkLocalPlayerStart(void* pLocalPlayer);
+	BOOL __stdcall HkGetCursorPos(LPPOINT lpPoint);
 
 	const constexpr unsigned int SWAPCHAIN_FULLSCREEN_INDEX = 10u;
 	const constexpr unsigned int SWAPCHAIN_PRESENT_INDEX = 8u;

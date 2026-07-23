@@ -247,3 +247,14 @@ LRESULT APIENTRY HooksDefinitions::HkWndProc(HWND hwnd, UINT uMsg, WPARAM wParam
 	ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam);
 	return CallWindowProc(oWndProc, hwnd, uMsg, wParam, lParam);
 }
+
+BOOL __stdcall HooksDefinitions::HkGetCursorPos(LPPOINT lpPoint)
+{
+	if (g_hasAimTarget)
+	{
+		lpPoint->x = g_aimTarget.x;
+		lpPoint->y = g_aimTarget.y;
+		return TRUE;
+	}
+	return oGetCursorPos(lpPoint);
+}

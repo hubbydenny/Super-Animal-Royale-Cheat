@@ -12,140 +12,6 @@ constexpr int TAB_AIMBOT  = 0;
 constexpr int TAB_CONFIG  = 4;
 constexpr ImVec4 AccentColor = { 165, 233, 100, 255 };
 
-static void DrawTabButton(const char* label, int tab_id)
-{
-	bool isActive = (g_activeTab == tab_id);
-	if (isActive)
-		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.647f, 0.914f, 0.392f, 1.0f));
-
-	if (ImGui::Selectable(label, isActive, ImGuiSelectableFlags_None, ImVec2(120, 30)))
-		g_activeTab = tab_id;
-
-	if (isActive)
-		ImGui::PopStyleColor();
-}
-
-static void DrawTabVisuals(Config& cfg)
-{
-	ImGui::Checkbox("##esp", &cfg.bEsp);
-	ImGui::SameLine();
-	ImGui::Text("Enable Visuals");
-	
-	if (cfg.bEsp)
-	{
-		if (ImGui::BeginChild("##visuals_scroll", ImVec2(0, 0), ImGuiChildFlags_None, ImGuiWindowFlags_NoBackground))
-		{
-			ImGui::Indent(24.0f);
-			ImGui::Checkbox("Boxes", &cfg.bBoxes);
-			ImGui::Checkbox("Snap Lines", &cfg.bSnaplines);
-			ImGui::Checkbox("Arrows", &cfg.bArrows);
-			ImGui::Checkbox("Names", &cfg.bNames);
-			ImGui::Checkbox("Circle", &cfg.bCircle);
-			ImGui::Checkbox("##zoom", &cfg.bZoomOverride);
-			ImGui::SameLine();
-			ImGui::Text("Zoom Override");
-			if (cfg.bZoomOverride)
-			{
-				ImGui::Indent(24.0f);
-				ImGui::PushItemWidth(200.0f);
-				ImGui::SliderFloat("##zoomval", &cfg.fZoomOverrideValue, 67.5f, 400.0f, "%.1f");
-				ImGui::PopItemWidth();
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip("Player Fov");
-				ImGui::Unindent(24.0f);
-			}
-			if (cfg.bArrows || cfg.bSnaplines)
-			{
-				ImGui::PushItemWidth(200.0f);
-				if (cfg.bArrows)
-				{
-					ImGui::SliderFloat("##arrowsradius", &cfg.fArrowsRadius, 30.0f, 300.0f, "%.0f");
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip("Arrows / Names radius");
-					ImGui::SliderFloat("##arrowthick", &cfg.fArrowThickness, 1.0f, 5.0f, "%.1f");
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip("Arrow line thickness");
-				}
-				if (cfg.bSnaplines)
-				{
-					ImGui::SliderFloat("##snaplen", &cfg.fSnaplineLength, 50.0f, 1500.0f, "%.0f");
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip("Snapline length");
-				}
-				ImGui::SliderFloat("##snapmax", &cfg.fMaxSnaplineRenderDistance, 0.0f, 5000.0f, "%.f");
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip("Max render distance");
-				ImGui::SliderFloat("##snapnear", &cfg.fNearSnaplineRenderDistance, 0.0f, 5000.0f, "%.f");
-				if (ImGui::IsItemHovered())
-					ImGui::SetTooltip("Near render distance");
-				ImGui::PopItemWidth();
-			}
-			ImGui::Unindent(24.0f);
-		}
-		ImGui::EndChild();
-	}
-	ImGui::Spacing();
-}
-
-static void DrawTabPlayers(GameContext& ctx)
-{
-	std::vector<NetworkPlayer*> snapshot;
-	LocalPlayerScript* localPlayer = nullptr;
-	{
-		std::lock_guard<std::mutex> lock(ctx.mtx);
-		snapshot.assign(ctx.players.begin(), ctx.players.end());
-		localPlayer = ctx.localPlayer;
-	}
-
-	int aliveCount = 0;
-	for (auto* player : snapshot)
-	{
-		if (player && !player->playerIsDead)
-			aliveCount++;
-	}
-
-	ImGui::Text("Alive: %d / %d", aliveCount, (int)snapshot.size());
-
-	ImGui::Spacing();
-	ImGui::Separator();
-	ImGui::Spacing();
-
-	if (snapshot.empty())
-	{
-		ImGui::TextDisabled("Waiting for players...");
-		return;
-	}
-
-	if (ImGui::BeginChild("##playerlist", ImVec2(0, 0), ImGuiChildFlags_Border))
-	{
-		for (auto* player : snapshot)
-		{
-			if (!player) continue;
-
-			ImVec4 color = player->playerIsDead
-				? ImVec4(0.6f, 0.2f, 0.2f, 1.0f)
-				: ImVec4(0.647f, 0.914f, 0.392f, 1.0f);
-
-			char narrowName[128] = "???";
-			if (player->playerName)
-			{
-				const wchar_t* wStr = (const wchar_t*)((const char*)player->playerName + 0x14);
-				int i = 0;
-				for (; i < 127 && wStr[i]; i++)
-					narrowName[i] = (char)wStr[i];
-				narrowName[i] = '\0';
-			}
-
-			ImGui::TextColored(color, "%s", narrowName);
-			ImGui::SameLine(200.0f);
-			ImGui::Text("HP: %.0f/%.0f", player->playerHP, player->playerHPMax);
-			ImGui::SameLine(320.0f);
-			ImGui::Text("ID: %d", player->playerID);
-		}
-	}
-	ImGui::EndChild();
-}
-
 static const char* GetKeyName(int vk)
 {
 	switch (vk)
@@ -269,6 +135,140 @@ static void DrawTabAimbot(Config& cfg)
 	}
 }
 
+static void DrawTabButton(const char* label, int tab_id)
+{
+	bool isActive = (g_activeTab == tab_id);
+	if (isActive)
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.647f, 0.914f, 0.392f, 1.0f));
+
+	if (ImGui::Selectable(label, isActive, ImGuiSelectableFlags_None, ImVec2(120, 30)))
+		g_activeTab = tab_id;
+
+	if (isActive)
+		ImGui::PopStyleColor();
+}
+
+static void DrawTabVisuals(Config& cfg)
+{
+	ImGui::Checkbox("##esp", &cfg.bEsp);
+	ImGui::SameLine();
+	ImGui::Text("Enable Visuals");
+	
+	if (cfg.bEsp)
+	{
+		if (ImGui::BeginChild("##visuals_scroll", ImVec2(0, 0), ImGuiChildFlags_None, ImGuiWindowFlags_NoBackground))
+		{
+			ImGui::Indent(24.0f);
+			ImGui::Checkbox("Boxes", &cfg.bBoxes);
+			ImGui::Checkbox("Snap Lines", &cfg.bSnaplines);
+			ImGui::Checkbox("Arrows", &cfg.bArrows);
+			ImGui::Checkbox("Names", &cfg.bNames);
+		//	ImGui::Checkbox("Circle", &cfg.bCircle);
+			ImGui::Checkbox("##zoom", &cfg.bZoomOverride);
+			ImGui::SameLine();
+			ImGui::Text("Zoom Override");
+			if (cfg.bZoomOverride)
+			{
+				ImGui::Indent(24.0f);
+				ImGui::PushItemWidth(200.0f);
+				ImGui::SliderFloat("##zoomval", &cfg.fZoomOverrideValue, 67.6f, 400.f, "%.1f");
+				ImGui::PopItemWidth();
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Player Fov");
+				ImGui::Unindent(24.0f);
+			}
+			if (cfg.bArrows || cfg.bSnaplines)
+			{
+				ImGui::PushItemWidth(200.0f);
+				if (cfg.bArrows)
+				{
+					ImGui::SliderFloat("##arrowsradius", &cfg.fArrowsRadius, 30.0f, 300.0f, "%.0f");
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip("Arrows / Names radius");
+					ImGui::SliderFloat("##arrowthick", &cfg.fArrowThickness, 1.0f, 5.0f, "%.1f");
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip("Arrow line thickness");
+				}
+				if (cfg.bSnaplines)
+				{
+					ImGui::SliderFloat("##snaplen", &cfg.fSnaplineLength, 50.0f, 1500.0f, "%.0f");
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip("Snapline length");
+				}
+				ImGui::SliderFloat("##snapmax", &cfg.fMaxSnaplineRenderDistance, 0.0f, 5000.0f, "%.f");
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Max render distance");
+				ImGui::SliderFloat("##snapnear", &cfg.fNearSnaplineRenderDistance, 0.0f, 5000.0f, "%.f");
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Near render distance");
+				ImGui::PopItemWidth();
+			}
+			ImGui::Unindent(24.0f);
+		}
+		ImGui::EndChild();
+	}
+	ImGui::Spacing();
+}
+
+static void DrawTabPlayers(GameContext& ctx)
+{
+	std::vector<NetworkPlayer*> snapshot;
+	LocalPlayerScript* localPlayer = nullptr;
+	{
+		std::lock_guard<std::mutex> lock(ctx.mtx);
+		snapshot.assign(ctx.players.begin(), ctx.players.end());
+		localPlayer = ctx.localPlayer;
+	}
+
+	int aliveCount = 0;
+	for (auto* player : snapshot)
+	{
+		if (player && !player->playerIsDead)
+			aliveCount++;
+	}
+
+	ImGui::Text("Alive: %d / %d", aliveCount, (int)snapshot.size());
+
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Spacing();
+
+	if (snapshot.empty())
+	{
+		ImGui::TextDisabled("Waiting for players...");
+		return;
+	}
+
+	if (ImGui::BeginChild("##playerlist", ImVec2(0, 0), ImGuiChildFlags_Border))
+	{
+		for (auto* player : snapshot)
+		{
+			if (!player) continue;
+
+			ImVec4 color = player->playerIsDead
+				? ImVec4(0.6f, 0.2f, 0.2f, 1.0f)
+				: ImVec4(0.647f, 0.914f, 0.392f, 1.0f);
+
+			char narrowName[128] = "???";
+			if (player->playerName)
+			{
+				const wchar_t* wStr = (const wchar_t*)((const char*)player->playerName + 0x14);
+				int i = 0;
+				for (; i < 127 && wStr[i]; i++)
+					narrowName[i] = (char)wStr[i];
+				narrowName[i] = '\0';
+			}
+
+			ImGui::TextColored(color, "%s", narrowName);
+			ImGui::SameLine(200.0f);
+			ImGui::Text("HP: %.0f/%.0f", player->playerHP, player->playerHPMax);
+			ImGui::SameLine(320.0f);
+			ImGui::Text("ID: %d", player->playerID);
+		}
+	}
+	ImGui::EndChild();
+}
+
 static void DrawTabMisc(Config& cfg)
 {
 	ImGui::TextColored(ImVec4(0.450f, 0.475f, 0.500f, 1.0f), "Add more features here");
@@ -337,10 +337,10 @@ void DrawMenu(Config& cfg, GameContext& ctx, bool menuOpen)
 		ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 5.0f);
 
 		ImGui::Spacing();
-		DrawTabButton("Visuals", TAB_VISUALS);
-		DrawTabButton("Players List", TAB_PLAYERS);
-		DrawTabButton("Misc", TAB_MISC);
 		DrawTabButton("Aimbot", TAB_AIMBOT);
+		DrawTabButton("Visuals", TAB_VISUALS);
+		DrawTabButton("Misc", TAB_MISC);
+		DrawTabButton("Players List", TAB_PLAYERS);
 		DrawTabButton("Config", TAB_CONFIG);
 
 		ImGui::PopStyleVar(2);
@@ -349,14 +349,14 @@ void DrawMenu(Config& cfg, GameContext& ctx, bool menuOpen)
 		ImGui::SetCursorPosY(titleH + 8.0f);
 		ImGui::BeginGroup();
 
-		if (g_activeTab == TAB_VISUALS)
-			DrawTabVisuals(cfg);
-		else if (g_activeTab == TAB_PLAYERS)
-			DrawTabPlayers(ctx);
+		if (g_activeTab == TAB_AIMBOT)
+			DrawTabAimbot(cfg);
 		else if (g_activeTab == TAB_MISC)
 			DrawTabMisc(cfg);
-		else if (g_activeTab == TAB_AIMBOT)
-			DrawTabAimbot(cfg);
+		else if (g_activeTab == TAB_PLAYERS)
+			DrawTabPlayers(ctx);
+		else if (g_activeTab == TAB_VISUALS)
+			DrawTabVisuals(cfg);
 		else if (g_activeTab == TAB_CONFIG)
 			DrawTabConfig(cfg);
 
