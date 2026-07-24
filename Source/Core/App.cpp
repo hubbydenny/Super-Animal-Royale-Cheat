@@ -36,7 +36,6 @@ void App::Run()
 	auto& context = m_hooks.GetGraphicsContext();
 	while (!GetAsyncKeyState(VK_DELETE) & 1)
 	{
-		
 		try
 		{
 			m_modules.Run();
@@ -45,6 +44,7 @@ void App::Run()
 		{
 			spdlog::error(exception.what());
 		}
+		Sleep(1);
 	}
 
 	m_modules.Shutdown();

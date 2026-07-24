@@ -1,0 +1,14 @@
+﻿  HooksManager.cpp
+C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Source\Core\Hooks\HooksImplementations.hpp(184,12): warning C4189: 'cy': local variable is initialized but not referenced
+  (compiling source file 'Source/Core/Hooks/HooksManager.cpp')
+  
+C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Source\Core\Hooks\HooksImplementations.hpp(183,12): warning C4189: 'cx': local variable is initialized but not referenced
+  (compiling source file 'Source/Core/Hooks/HooksManager.cpp')
+  
+  EspModule.cpp
+  Generating code
+  3 of 6189 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    25 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  SuperAnimalHack.vcxproj -> C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\bin\Release\SuperAnimalHack.dll

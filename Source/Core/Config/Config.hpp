@@ -23,7 +23,7 @@ struct Config
 	float fAimFov = 90.0f;
 	int iAimKey = 0x02;
 	int iAimMode = 0;
-    const float fZoomDefaultValue = 67.5f;
+    float fZoomDefaultValue = 67.5f;
 	float fZoomOverrideValue = fZoomDefaultValue;
 	float fArrowsRadius = 80.0f;
 	float fArrowThickness = 2.0f;

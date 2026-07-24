@@ -3,8 +3,10 @@
 #include "../../Core/Hooks/HooksDefinitions.hpp"
 #include "../../Core/GameStructs/GameStructs.hpp"
 #include <cmath>
+#include <cfloat>
 #include <Windows.h>
-
+#include "../Source/Core/Config/Config.hpp"
+#include "imgui.h"
 AimbotModule::AimbotModule(ModulesManager* const modules, HooksManager* const hooks, Config& cfg)
 	: ModuleBase(AIMBOT_MODULE_NAME, modules, hooks, cfg)
 {
@@ -26,7 +28,8 @@ void AimbotModule::Run()
 	}
 
 	const auto& ctx = hooks->GetGameContext();
-
+	ImDrawList* dl = ImGui::GetBackgroundDrawList();
+	if (!dl) return;
 	NetworkPlayer* localNet = nullptr;
 	std::vector<NetworkPlayer*> snapshot;
 
@@ -47,7 +50,20 @@ void AimbotModule::Run()
 		return;
 	}
 
-	float bestDist = 999999.0f;
+	HWND hwnd = hooks->GetGraphicsContext().hwnd;
+	if (!hwnd)
+	{
+		HooksDefinitions::g_hasAimTarget = false;
+		return;
+	}
+
+	RECT rect;
+	GetWindowRect(hwnd, &rect);
+	float cx = (rect.left + rect.right) * 0.5f;
+	float cy = (rect.top + rect.bottom) * 0.5f;
+
+	float maxDistSq = cfg.fAimFov * cfg.fAimFov;
+	float bestDist = FLT_MAX;
 	NetworkPlayer* bestTarget = nullptr;
 
 	for (auto* target : snapshot)
@@ -56,8 +72,11 @@ void AimbotModule::Run()
 
 		float dx = target->previousPosition.x - localNet->previousPosition.x;
 		float dy = target->previousPosition.y - localNet->previousPosition.y;
-		float dist = std::sqrtf(dx * dx + dy * dy);
+		float distSq = dx * dx + dy * dy;
 
+		if (distSq > maxDistSq) continue;
+
+		float dist = std::sqrtf(distSq);
 		if (dist < bestDist)
 		{
 			bestDist = dist;
@@ -75,20 +94,8 @@ void AimbotModule::Run()
 	float dy = bestTarget->previousPosition.y - localNet->previousPosition.y;
 	float angle = std::atan2f(dy, dx);
 
-	HWND hwnd = hooks->GetGraphicsContext().hwnd;
-	if (!hwnd)
-	{
-		HooksDefinitions::g_hasAimTarget = false;
-		return;
-	}
-
-	RECT rect;
-	GetWindowRect(hwnd, &rect);
-	float cx = (rect.left + rect.right) * 0.5f;
-	float cy = (rect.top + rect.bottom) * 0.5f;
-
-	float aimDist = 200.0f;
-	HooksDefinitions::g_aimTarget.x = (LONG)(cx + std::cosf(angle) * aimDist);
-	HooksDefinitions::g_aimTarget.y = (LONG)(cy - std::sinf(angle) * aimDist);
+	float AimDist = 200.0f;
+	HooksDefinitions::g_aimTarget.x = (LONG)(cx + std::cosf(angle) * AimDist);
+	HooksDefinitions::g_aimTarget.y = (LONG)(cy - std::sinf(angle) * AimDist);
 	HooksDefinitions::g_hasAimTarget = true;
 }

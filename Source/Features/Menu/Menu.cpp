@@ -71,11 +71,10 @@ static void DrawTabAimbot(Config& cfg)
 	{
 		ImGui::Indent(24.0f);
 
-		ImGui::Checkbox("FOV Circle", &cfg.bAimFovCircle);
 		ImGui::PushItemWidth(200.0f);
-		ImGui::SliderFloat("##aimfov", &cfg.fAimFov, 10.0f, 500.0f, "%.0f");
+		ImGui::SliderFloat("##aimfov", &cfg.fAimFov, 10.0f, 2000.0f, "%.0f");
 		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip("Aimbot FOV radius");
+			ImGui::SetTooltip("Max aim distance");
 		ImGui::PopItemWidth();
 
 		const char* modeNames[] = { "Hold", "Toggle", "Always On" };

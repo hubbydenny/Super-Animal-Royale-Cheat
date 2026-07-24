@@ -47,7 +47,7 @@ void EspModule::DrawNames()
 		float screenX = cx + dx * pixelsPerUnit;
 		float screenY = cy - dy * pixelsPerUnit;
 		float dist = std::sqrtf(dx * dx + dy * dy);
-		float TextY = 3.0f * pixelsPerUnit;
+		float TextY = 7.0f * pixelsPerUnit;
 		if (dist < 0.1f) continue;
 		wchar_t* wName = (wchar_t*)((char*)target->playerName + 0x14);
 		if (!wName) continue;
@@ -61,11 +61,6 @@ void EspModule::DrawNames()
 		ImVec2 textSize = ImGui::CalcTextSize(narrow);
 		dl->AddText(ImVec2(screenX - textSize.x * 0.5f, screenY - TextY - 8.0f),
 			IM_COL32(255, 255, 255, 255), narrow);
-
-	//	char hpBuf[32];
-	//	snprintf(hpBuf, sizeof(hpBuf), "%.0f", target->playerHP);
-	//	dl->AddText(ImVec2(dx - 8.0f, dy + 8.0f),
-		//	IM_COL32(0, 255, 0, 200), hpBuf);
 	}
 }
 //void EspModule::DrawHealth() {
@@ -126,7 +121,7 @@ void EspModule::DrawArrows()
 		dl->AddLine(ImVec2(tipX, tipY), ImVec2(tipX + std::cosf(pa + ha) * HL, tipY - std::sinf(pa + ha) * HL), color, cfg.fArrowThickness);
 	}
 	if (cfg.bCircle) return;
-	dl->AddCircle(ImVec2(cx, cy), R, IM_COL32(255, 255, 255, 80), 64, 1.0f);
+//	dl->AddCircle(ImVec2(cx, cy), R, IM_COL32(255, 255, 255, 80), 64, 1.0f);
 }
 void EspModule::DrawSnaplines()
 {

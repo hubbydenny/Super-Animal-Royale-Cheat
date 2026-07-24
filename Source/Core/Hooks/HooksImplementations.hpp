@@ -174,35 +174,16 @@ HRESULT __stdcall HooksDefinitions::HkSwapChainPresent(IDXGISwapChain* pSwapChai
 
 				auto* const esp = modules->GetModule<EspModule>(ESP_MODULE_NAME);
 
-			{
-				ImDrawList* dbgDl = ImGui::GetForegroundDrawList();
-				if (dbgDl && gpCtx)
-				{
-					LocalPlayerScript* lp = nullptr;
-					void* cam = nullptr;
-					size_t pc = 0;
-					{
-						std::lock_guard<std::mutex> lk(gpCtx->mtx);
-						lp = gpCtx->localPlayer;
-						pc = gpCtx->players.size();
-						if (lp) cam = lp->camera;
-					}
-					
-					//char buf[256];
-				//	snprintf(buf, sizeof(buf),
-					//	"local: %s | cam: %s | players: %zu | esp: %s",
-					//	lp ? "OK" : "NULL",
-						//cam ? "OK" : "NULL",
-						//pc,
-						//cfg.bEsp ? "ON" : "OFF");
-				//	dbgDl->AddText(ImVec2(8.0f, 8.0f), IM_COL32(255, 255, 0, 255), buf);
-				}
-			}
-			//draw func
 				esp->DrawArrows();
 				esp->DrawBoxes();
 				esp->DrawSnaplines();
 				esp->DrawNames();
+				if (cfg.bAimbot)
+				{
+					float cx = ImGui::GetIO().DisplaySize.x * 0.5f;
+					float cy = ImGui::GetIO().DisplaySize.y * 0.5f;
+			//		ImGui::GetBackgroundDrawList()->AddCircle(ImVec2(cx, cy), cfg.fAimFov, IM_COL32(255, 255, 255, 80), 64, 1.0f);
+				}
 				if (gpCtx)
 				{
 					auto* misc = modules->GetModule<MiscModule>(MISC_MODULE_NAME);
@@ -250,11 +231,14 @@ LRESULT APIENTRY HooksDefinitions::HkWndProc(HWND hwnd, UINT uMsg, WPARAM wParam
 
 BOOL __stdcall HooksDefinitions::HkGetCursorPos(LPPOINT lpPoint)
 {
+	BOOL result = oGetCursorPos(lpPoint);
+	if (result)
+		g_realCursorPos = *lpPoint;
+
 	if (g_hasAimTarget)
 	{
 		lpPoint->x = g_aimTarget.x;
 		lpPoint->y = g_aimTarget.y;
-		return TRUE;
 	}
-	return oGetCursorPos(lpPoint);
+	return result;
 }

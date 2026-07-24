@@ -27,6 +27,7 @@ namespace HooksDefinitions
 	inline WNDPROC oWndProc = nullptr;
 
 	inline BOOL(__stdcall* oGetCursorPos)(LPPOINT lpPoint) = nullptr;
+	inline POINT g_realCursorPos = { 0, 0 };
 	inline POINT g_aimTarget = { 0, 0 };
 	inline bool g_hasAimTarget = false;
 	
