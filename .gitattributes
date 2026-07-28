@@ -1,2 +1,7 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+*.foo linguist-detectable=false
+*.make linguist-detectable=false
+*.Jinja linguist-detectable=false
+*.Starlark linguist-detectable=false
+*.py linguist-detectable=false
