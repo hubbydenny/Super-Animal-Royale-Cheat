@@ -1,4 +1,4 @@
-﻿#include "Aimbot.hpp"
+#include "Aimbot.hpp"
 #include "../../Core/Hooks/HooksManager.hpp"
 #include "../../Core/Hooks/HooksDefinitions.hpp"
 #include "../../Core/GameStructs/GameStructs.hpp"
@@ -20,8 +20,7 @@ void AimbotModule::Run()
 		return;
 	}
 
-	bool keyPressed = (GetAsyncKeyState(cfg.iAimKey) & 0x8000) != 0;
-	if (!keyPressed && cfg.iAimMode == 0)
+	if (!cfg.kbAim.UpdateState())
 	{
 		HooksDefinitions::g_hasAimTarget = false;
 		return;
@@ -69,6 +68,7 @@ void AimbotModule::Run()
 	for (auto* target : snapshot)
 	{
 		if (!target || target == localNet || target->playerIsDead) continue;
+		if (cfg.IsFriend(target->playerID)) continue;
 
 		float dx = target->previousPosition.x - localNet->previousPosition.x;
 		float dy = target->previousPosition.y - localNet->previousPosition.y;

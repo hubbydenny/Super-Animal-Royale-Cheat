@@ -23,7 +23,7 @@ enum struct EPlatformType // GEnum26
 	Switch,
 	FB
 };
-enum struct EWalkMode // GEnum34
+enum struct EWalkMode : uint8_t // GEnum34
 {
 	Slow,
 	Normal,
@@ -121,9 +121,13 @@ public:
 	Vector2 currentPosition; //0x0320 - current world position
 	float timeUntilChatBubbleIsRemoved; //0x0328
 	Vector2 previousPosition; //0x032C
-	char pad_0334[60]; //0x0334 - footsteps, parachuting
+	char pad_0334[28]; //0x0334
+	float currParachuteHeight; //0x0350
+	char pad_0354[28]; //0x0354
 	bool inFlight; //0x0370
-	char pad_0371[85]; //0x0371 - flight, stun, walkmode, emotes
+	char pad_0371[12]; //0x0371
+	EWalkMode currentWalkMode; //0x037D
+	char pad_037E[72]; //0x037E
 	bool isZombie; //0x03C6
 	char pad_03C7[77]; //0x03C7
 	float rollStartTime; //0x0414

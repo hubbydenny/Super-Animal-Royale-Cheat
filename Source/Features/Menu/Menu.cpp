@@ -10,6 +10,7 @@ constexpr int TAB_PLAYERS = 1;
 constexpr int TAB_MISC    = 2;
 constexpr int TAB_AIMBOT  = 0;
 constexpr int TAB_CONFIG  = 4;
+constexpr int TAB_MOVEMENT = 5;
 constexpr ImVec4 AccentColor = { 165, 233, 100, 255 };
 
 static const char* GetKeyName(int vk)
@@ -60,80 +61,6 @@ static const char* GetKeyName(int vk)
 	default: return "???";
 	}
 }
-
-static void DrawTabAimbot(Config& cfg)
-{
-	ImGui::Checkbox("##aimbot_en", &cfg.bAimbot);
-	ImGui::SameLine();
-	ImGui::Text("Enable Aimbot");
-
-	if (cfg.bAimbot)
-	{
-		ImGui::Indent(24.0f);
-
-		ImGui::PushItemWidth(200.0f);
-		ImGui::SliderFloat("##aimfov", &cfg.fAimFov, 10.0f, 2000.0f, "%.0f");
-		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip("Max aim distance");
-		ImGui::PopItemWidth();
-
-		const char* modeNames[] = { "Hold", "Toggle", "Always On" };
-
-		static bool waitingForKey = false;
-
-		if (waitingForKey)
-		{
-			ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Press any key...");
-
-			for (int vk = 2; vk < 256; vk++)
-			{
-				if (vk == VK_ESCAPE)
-				{
-					if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
-						waitingForKey = false;
-					continue;
-				}
-				if (GetAsyncKeyState(vk) & 0x8000)
-				{
-					cfg.iAimKey = vk;
-					waitingForKey = false;
-					break;
-				}
-			}
-		}
-		else
-		{
-			const char* keyName = GetKeyName(cfg.iAimKey);
-			char keyBuf[64];
-			snprintf(keyBuf, sizeof(keyBuf), "[%s] - %s", keyName, modeNames[cfg.iAimMode]);
-
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.15f, 0.15f, 0.18f, 1.0f));
-			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.25f, 0.25f, 0.30f, 1.0f));
-			ImGui::Button(keyBuf, ImVec2(200.0f, 24.0f));
-			ImGui::PopStyleColor(2);
-
-			if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
-				waitingForKey = true;
-
-			if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
-				ImGui::OpenPopup("##aim_mode_popup");
-
-			if (ImGui::BeginPopup("##aim_mode_popup"))
-			{
-				for (int i = 0; i < 3; i++)
-				{
-					bool selected = (cfg.iAimMode == i);
-					if (ImGui::Selectable(modeNames[i], selected))
-						cfg.iAimMode = i;
-				}
-				ImGui::EndPopup();
-			}
-		}
-
-		ImGui::Unindent(24.0f);
-	}
-}
-
 static void DrawTabButton(const char* label, int tab_id)
 {
 	bool isActive = (g_activeTab == tab_id);
@@ -147,22 +74,148 @@ static void DrawTabButton(const char* label, int tab_id)
 		ImGui::PopStyleColor();
 }
 
+static void DrawBindGear(const char* id, KeyBind& kb)
+{
+	ImGui::SameLine(320.0f);
+	
+	char gearLabel[64];
+	if (kb.key != 0)
+	{
+		const char* modeNames[] = { "Hold", "Toggle", "Always" };
+		snprintf(gearLabel, sizeof(gearLabel), " %s [%s] ##gear_%s", GetKeyName(kb.key), modeNames[kb.mode], id);
+	}
+	else
+	{
+		snprintf(gearLabel, sizeof(gearLabel), " Bind ##gear_%s", id);
+	}
+
+	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(8, 4));
+	ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
+	ImGui::PushStyleColor(ImGuiCol_Button, kb.key != 0 ? ImVec4(0.2f, 0.22f, 0.26f, 0.9f) : ImVec4(0.14f, 0.15f, 0.18f, 0.8f));
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.647f, 0.914f, 0.392f, 0.35f));
+	ImGui::PushStyleColor(ImGuiCol_Text, kb.key != 0 ? ImVec4(0.647f, 0.914f, 0.392f, 1.0f) : ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
+
+	if (ImGui::Button(gearLabel, ImVec2(0, 24)))
+	{
+		char popupId[64];
+		snprintf(popupId, sizeof(popupId), "##bind_pop_%s", id);
+		ImGui::OpenPopup(popupId);
+	}
+	ImGui::PopStyleColor(3);
+	ImGui::PopStyleVar(2);
+
+	char popupId[64];
+	snprintf(popupId, sizeof(popupId), "##bind_pop_%s", id);
+	if (ImGui::BeginPopup(popupId))
+	{
+		static bool waitingForKey = false;
+		static std::string waitingId = "";
+
+		ImGui::Text("Keybind Settings");
+		ImGui::Separator();
+
+		if (waitingForKey && waitingId == id)
+		{
+			ImGui::TextColored(ImVec4(1.0f, 0.3f, 0.3f, 1.0f), "Press any key (ESC to clear)...");
+			for (int vk = 1; vk < 256; vk++)
+			{
+				if (GetAsyncKeyState(vk) & 0x8000)
+				{
+					if (vk == VK_ESCAPE)
+						kb.key = 0;
+					else
+						kb.key = vk;
+					waitingForKey = false;
+					break;
+				}
+			}
+		}
+		else
+		{
+			const char* kName = (kb.key == 0) ? "None" : GetKeyName(kb.key);
+			if (ImGui::Button(kName, ImVec2(120, 24)))
+			{
+				waitingForKey = true;
+				waitingId = id;
+			}
+
+			const char* modeNames[] = { "Hold", "Toggle", "Always On" };
+			for (int i = 0; i < 3; i++)
+			{
+				if (ImGui::RadioButton(modeNames[i], kb.mode == i))
+					kb.mode = i;
+			}
+		}
+		ImGui::EndPopup();
+	}
+}
+static void DrawTabAimbot(Config& cfg)
+{
+	ImGui::Checkbox("##aimbot_en", &cfg.bAimbot);
+	ImGui::SameLine();
+	ImGui::Text("Enable Aimbot");
+	DrawBindGear("aimbot", cfg.kbAim);
+	if (cfg.bAimbot)
+	{
+		ImGui::Indent(24.0f);
+		ImGui::Text("Max Target Distance");
+		ImGui::PushItemWidth(200.0f);
+		ImGui::SliderFloat("##aimdist", &cfg.fAimFov, 10.0f, 2000.0f, "%.0f");
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Maximum distance to target in world units");
+
+		ImGui::PopItemWidth();
+		ImGui::Unindent(24.0f);
+	}
+}
+
 static void DrawTabVisuals(Config& cfg)
 {
 	ImGui::Checkbox("##esp", &cfg.bEsp);
 	ImGui::SameLine();
 	ImGui::Text("Enable Visuals");
+	DrawBindGear("esp", cfg.kbEsp);
 	
 	if (cfg.bEsp)
 	{
-		if (ImGui::BeginChild("##visuals_scroll", ImVec2(0, 0), ImGuiChildFlags_None, ImGuiWindowFlags_NoBackground))
+		if (ImGui::BeginChild("##visuals_scroll", ImVec2(0, 360.f), ImGuiChildFlags_None, ImGuiWindowFlags_NoBackground))
 		{
 			ImGui::Indent(24.0f);
 			ImGui::Checkbox("Boxes", &cfg.bBoxes);
+			DrawBindGear("boxes", cfg.kbBoxes);
+
 			ImGui::Checkbox("Snap Lines", &cfg.bSnaplines);
+			DrawBindGear("snaplines", cfg.kbSnaplines);
+
 			ImGui::Checkbox("Arrows", &cfg.bArrows);
+			DrawBindGear("arrows", cfg.kbArrows);
+
 			ImGui::Checkbox("Names", &cfg.bNames);
-		//	ImGui::Checkbox("Circle", &cfg.bCircle);
+			DrawBindGear("names", cfg.kbNames);
+
+			ImGui::Checkbox("Armor ESP", &cfg.bArmorEsp);
+			DrawBindGear("armoresp", cfg.kbArmorEsp);
+
+			ImGui::Checkbox("Grenade ESP", &cfg.bGrenadeEsp);
+			DrawBindGear("nadeesp", cfg.kbGrenadeEsp);
+
+			ImGui::Spacing();
+			ImGui::Separator();
+			ImGui::Text("Colors");
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
+			ImGui::ColorEdit4("##colBox", cfg.colBox.data(), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_NoAlpha);
+			ImGui::SameLine(); ImGui::Text("Box");
+			ImGui::SameLine(0, 16);
+			ImGui::ColorEdit4("##colName", cfg.colName.data(), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_NoAlpha);
+			ImGui::SameLine(); ImGui::Text("Name");
+			ImGui::ColorEdit4("##colArmor", cfg.colArmor.data(), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_NoAlpha);
+			ImGui::SameLine(); ImGui::Text("Armor");
+			ImGui::SameLine(0, 16);
+			ImGui::ColorEdit4("##colNade", cfg.colGrenade.data(), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_NoAlpha);
+			ImGui::SameLine(); ImGui::Text("Nade");
+			ImGui::PopStyleVar();
+			ImGui::Separator();
+
 			ImGui::Checkbox("##zoom", &cfg.bZoomOverride);
 			ImGui::SameLine();
 			ImGui::Text("Zoom Override");
@@ -209,7 +262,7 @@ static void DrawTabVisuals(Config& cfg)
 	ImGui::Spacing();
 }
 
-static void DrawTabPlayers(GameContext& ctx)
+static void DrawTabPlayers(GameContext& ctx, Config& cfg)
 {
 	std::vector<NetworkPlayer*> snapshot;
 	LocalPlayerScript* localPlayer = nullptr;
@@ -227,6 +280,8 @@ static void DrawTabPlayers(GameContext& ctx)
 	}
 
 	ImGui::Text("Alive: %d / %d", aliveCount, (int)snapshot.size());
+	ImGui::SameLine(180.0f);
+	ImGui::TextColored(ImVec4(0.2f, 0.85f, 1.0f, 1.0f), "Lmb - friend add");
 
 	ImGui::Spacing();
 	ImGui::Separator();
@@ -244,24 +299,48 @@ static void DrawTabPlayers(GameContext& ctx)
 		{
 			if (!player) continue;
 
-			ImVec4 color = player->playerIsDead
-				? ImVec4(0.6f, 0.2f, 0.2f, 1.0f)
-				: ImVec4(0.647f, 0.914f, 0.392f, 1.0f);
+			bool isFriend = cfg.IsFriend(player->playerID);
+
+			ImVec4 color;
+			if (player->playerIsDead)
+				color = ImVec4(0.6f, 0.2f, 0.2f, 1.0f);
+			else if (isFriend)
+				color = ImVec4(0.2f, 0.85f, 1.0f, 1.0f);
+			else
+				color = ImVec4(0.647f, 0.914f, 0.392f, 1.0f);
 
 			char narrowName[128] = "???";
-			if (player->playerName)
+			if (player->playerName && !IsBadReadPtr(player->playerName, 0x18))
 			{
-				const wchar_t* wStr = (const wchar_t*)((const char*)player->playerName + 0x14);
-				int i = 0;
-				for (; i < 127 && wStr[i]; i++)
-					narrowName[i] = (char)wStr[i];
-				narrowName[i] = '\0';
+				int32_t len = *reinterpret_cast<int32_t*>(reinterpret_cast<char*>(player->playerName) + 0x10);
+				if (len > 0 && len < 256)
+				{
+					const wchar_t* wStr = reinterpret_cast<const wchar_t*>(reinterpret_cast<const char*>(player->playerName) + 0x14);
+					if (!IsBadReadPtr(wStr, len * sizeof(wchar_t)))
+					{
+						int i = 0;
+						for (; i < 127 && i < len && wStr[i]; i++)
+							narrowName[i] = (wStr[i] < 128) ? (char)wStr[i] : '?';
+						narrowName[i] = '\0';
+					}
+				}
 			}
 
-			ImGui::TextColored(color, "%s", narrowName);
-			ImGui::SameLine(200.0f);
+			char labelBuf[256];
+			snprintf(labelBuf, sizeof(labelBuf), "%s%s##p_%d", isFriend ? "(Friend) " : "", narrowName, player->playerID);
+
+			ImGui::PushStyleColor(ImGuiCol_Text, color);
+			ImGui::Selectable(labelBuf, isFriend, ImGuiSelectableFlags_AllowOverlap);
+			ImGui::PopStyleColor();
+
+			if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
+			{
+				cfg.ToggleFriend(player->playerID);
+			}
+
+			ImGui::SameLine(240.0f);
 			ImGui::Text("HP: %.0f/%.0f", player->playerHP, player->playerHPMax);
-			ImGui::SameLine(320.0f);
+			ImGui::SameLine(360.0f);
 			ImGui::Text("ID: %d", player->playerID);
 		}
 	}
@@ -270,11 +349,221 @@ static void DrawTabPlayers(GameContext& ctx)
 
 static void DrawTabMisc(Config& cfg)
 {
-	ImGui::TextColored(ImVec4(0.450f, 0.475f, 0.500f, 1.0f), "Add more features here");
+	ImGui::Checkbox("##featurelist_en", &cfg.bFeatureList);
+	ImGui::SameLine();
+	ImGui::Text("Feature Indicator");
+	DrawBindGear("featurelist", cfg.kbFeatureList);
+
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Spacing();
+
+	ImGui::Checkbox("##velocity_en", &cfg.bVelocityIndicator);
+	ImGui::SameLine();
+	ImGui::Text("Velocity Indicator");
+	DrawBindGear("velocity", cfg.kbVelocityIndicator);
+}
+
+static void DrawTabMovement(Config& cfg)
+{
+	ImGui::Checkbox("##bhop_en", &cfg.bBhop);
+	ImGui::SameLine();
+	ImGui::Text("Jump Boost");
+	DrawBindGear("Jb", cfg.kbBhop);
+	ImGui::Spacing();
+
+	ImGui::Checkbox("##fast_parachute", &cfg.bFastParachute);
+	ImGui::SameLine();
+	ImGui::Text("Fast Parachute Drop");
+	DrawBindGear("parachute", cfg.kbFastParachute);
+
+	if (cfg.bFastParachute)
+	{
+		ImGui::Indent(24.0f);
+		ImGui::PushItemWidth(200.0f);
+		ImGui::SliderFloat("##dropspeed", &cfg.fParachuteDropSpeed, 1.0f, 50.0f, "%.1f");
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Parachute drop speed multiplier");
+		ImGui::PopItemWidth();
+		ImGui::Unindent(24.0f);
+	}
+
+	ImGui::Spacing();
+
+	ImGui::Checkbox("##anim_disable", &cfg.bDisableMoveAnim);
+	ImGui::SameLine();
+	ImGui::Text("Disable Movement Animation");
+	DrawBindGear("moveanim", cfg.kbDisableMoveAnim);
+
+	ImGui::Spacing();
+
+	ImGui::Checkbox("##vehicle_fly", &cfg.bVehicleFly);
+	ImGui::SameLine();
+	ImGui::Text("Vehicle / Hamster Ball Fly");
+	DrawBindGear("vehiclefly", cfg.kbVehicleFly);
+
+	if (cfg.bVehicleFly)
+	{
+		ImGui::Indent(24.0f);
+		ImGui::PushItemWidth(200.0f);
+		ImGui::SliderFloat("Fly Speed", &cfg.fVehicleFlySpeed, 5.0f, 200.0f, "%.1f");
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Speed of flying in vehicle or hamster ball");
+		ImGui::PopItemWidth();
+		ImGui::Unindent(24.0f);
+	}
 }
 
 static void DrawTabConfig(Config& cfg)
 {
+	static std::vector<std::string> configFiles;
+	static int selectedConfig = -1;
+	static char newConfigName[64] = "my_config";
+	static std::string statusMsg = "";
+	static ImVec4 statusColor = ImVec4(0.647f, 0.914f, 0.392f, 1.0f);
+	static bool initialized = false;
+
+	auto RefreshConfigs = []() {
+		configFiles.clear();
+		WIN32_FIND_DATAA findData;
+		HANDLE hFind = FindFirstFileA("*.json", &findData);
+		if (hFind != INVALID_HANDLE_VALUE)
+		{
+			do
+			{
+				if (!(findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+				{
+					configFiles.push_back(findData.cFileName);
+				}
+			} while (FindNextFileA(hFind, &findData));
+			FindClose(hFind);
+		}
+	};
+
+	if (!initialized)
+	{
+		RefreshConfigs();
+		initialized = true;
+	}
+
+	ImGui::Text("Config List");
+	ImGui::Indent(8.0f);
+
+	if (ImGui::BeginChild("##config_list_child", ImVec2(340, 110), true))
+	{
+		if (configFiles.empty())
+		{
+			ImGui::TextDisabled("No configs found ()");
+		}
+		else
+		{
+			for (int i = 0; i < (int)configFiles.size(); i++)
+			{
+				bool isSelected = (selectedConfig == i);
+				if (ImGui::Selectable(configFiles[i].c_str(), isSelected))
+				{
+					selectedConfig = i;
+				}
+			}
+		}
+	}
+	ImGui::EndChild();
+
+	ImGui::Spacing();
+
+	if (ImGui::Button("Refresh", ImVec2(75, 24)))
+	{
+		RefreshConfigs();
+		statusMsg = "Refreshed list!";
+		statusColor = ImVec4(0.647f, 0.914f, 0.392f, 1.0f);
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Load Selected", ImVec2(105, 24)))
+	{
+		if (selectedConfig >= 0 && selectedConfig < (int)configFiles.size())
+		{
+			if (cfg.LoadFromFile(configFiles[selectedConfig]))
+			{
+				statusMsg = "Loaded: " + configFiles[selectedConfig];
+				statusColor = ImVec4(0.3f, 0.9f, 0.3f, 1.0f);
+			}
+			else
+			{
+				statusMsg = "Failed to load!";
+				statusColor = ImVec4(0.9f, 0.3f, 0.3f, 1.0f);
+			}
+		}
+		else
+		{
+			statusMsg = "Select a config first!";
+			statusColor = ImVec4(0.9f, 0.7f, 0.2f, 1.0f);
+		}
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Save Selected", ImVec2(105, 24)))
+	{
+		if (selectedConfig >= 0 && selectedConfig < (int)configFiles.size())
+		{
+			if (cfg.SaveToFile(configFiles[selectedConfig]))
+			{
+				statusMsg = "Saved: " + configFiles[selectedConfig];
+				statusColor = ImVec4(0.3f, 0.9f, 0.3f, 1.0f);
+			}
+			else
+			{
+				statusMsg = "Failed to save!";
+				statusColor = ImVec4(0.9f, 0.3f, 0.3f, 1.0f);
+			}
+		}
+	}
+
+	ImGui::Spacing();
+
+	ImGui::PushItemWidth(180.0f);
+	ImGui::InputText("##newcfgname", newConfigName, sizeof(newConfigName));
+	ImGui::PopItemWidth();	
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Create New", ImVec2(90, 24)))
+	{
+		std::string name = newConfigName;
+		if (name.find(".json") == std::string::npos)
+			name += ".json";
+
+		if (cfg.SaveToFile(name))
+		{
+			statusMsg = "Created: " + name;
+			statusColor = ImVec4(0.3f, 0.9f, 0.3f, 1.0f);
+			RefreshConfigs();
+		}
+	}
+
+	ImGui::SameLine();
+
+	if (ImGui::Button("Reset", ImVec2(55, 24)))
+	{
+		cfg.Reset();
+		statusMsg = "Reset to defaults!";
+		statusColor = ImVec4(0.9f, 0.7f, 0.2f, 1.0f);
+	}
+
+	if (!statusMsg.empty())
+	{
+		ImGui::Spacing();
+		ImGui::TextColored(statusColor, "%s", statusMsg.c_str());
+	}
+
+	ImGui::Unindent(8.0f);
+
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Spacing();
+
 	ImGui::Text("Controls");
 	ImGui::Indent(8.0f);
 	ImGui::TextColored(ImVec4(0.647f, 0.914f, 0.392f, 1.0f), "Insert Key");
@@ -285,7 +574,7 @@ static void DrawTabConfig(Config& cfg)
 	ImGui::Spacing();
 	ImGui::Separator();
 	ImGui::Spacing();
-	/**/
+
 	ImGui::Text("Debug");
 	ImGui::Indent(8.0f);
 	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.6f, 0.15f, 0.15f, 0.8f));
@@ -326,9 +615,10 @@ void DrawMenu(Config& cfg, GameContext& ctx, bool menuOpen)
 			ImVec2(wPos.x + wSize.x, wPos.y + titleH),
 			ImColor(0.647f, 0.914f, 0.392f, 0.5f));
 
+		float sidebarW = 140.0f;
+
 		ImGui::SetCursorPosY(titleH + 4.0f);
 
-		float sidebarW = 140.0f;
 		ImGui::Columns(2, "##layout", false);
 		ImGui::SetColumnWidth(0, sidebarW);
 
@@ -338,6 +628,7 @@ void DrawMenu(Config& cfg, GameContext& ctx, bool menuOpen)
 		ImGui::Spacing();
 		DrawTabButton("Aimbot", TAB_AIMBOT);
 		DrawTabButton("Visuals", TAB_VISUALS);
+		DrawTabButton("Movement", TAB_MOVEMENT);
 		DrawTabButton("Misc", TAB_MISC);
 		DrawTabButton("Players List", TAB_PLAYERS);
 		DrawTabButton("Config", TAB_CONFIG);
@@ -346,20 +637,24 @@ void DrawMenu(Config& cfg, GameContext& ctx, bool menuOpen)
 
 		ImGui::NextColumn();
 		ImGui::SetCursorPosY(titleH + 8.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
 		ImGui::BeginGroup();
 
 		if (g_activeTab == TAB_AIMBOT)
 			DrawTabAimbot(cfg);
 		else if (g_activeTab == TAB_MISC)
 			DrawTabMisc(cfg);
+		else if (g_activeTab == TAB_MOVEMENT)
+			DrawTabMovement(cfg);
 		else if (g_activeTab == TAB_PLAYERS)
-			DrawTabPlayers(ctx);
+			DrawTabPlayers(ctx, cfg);
 		else if (g_activeTab == TAB_VISUALS)
 			DrawTabVisuals(cfg);
 		else if (g_activeTab == TAB_CONFIG)
 			DrawTabConfig(cfg);
 
 		ImGui::EndGroup();
+		ImGui::PopStyleVar();
 		ImGui::Columns(1);
 	}
 	else

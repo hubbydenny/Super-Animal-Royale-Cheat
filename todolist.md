@@ -1,3 +1,2 @@
-#fix Names
-#make better menu & design
-#fix boxes and add custom colors
+#todolist 
+1.make prediction for Aimbot

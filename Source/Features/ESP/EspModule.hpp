@@ -12,4 +12,6 @@ public:
 	void DrawBoxes();
 	void DrawNames();
 	void DrawSnaplines();
+	void DrawArmor();
+	void DrawGrenades();
 };

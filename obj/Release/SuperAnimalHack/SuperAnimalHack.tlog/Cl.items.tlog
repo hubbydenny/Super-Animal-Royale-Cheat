@@ -9,7 +9,7 @@ C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Source\Core\Me
 C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Source\Core\Logging\LogManager.cpp;C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\obj\Release\SuperAnimalHack\LogManager.obj
 C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Source\Core\Hooks\HooksManager.cpp;C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\obj\Release\SuperAnimalHack\HooksManager.obj
 C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Source\Features\ESP\EspModule.cpp;C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\obj\Release\SuperAnimalHack\EspModule.obj
-C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Source\Features\Bunnyhop\Bunnyhop.cpp;C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\obj\Release\SuperAnimalHack\Bunnyhop.obj
+C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Source\Features\Movement\Movement.cpp;C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\obj\Release\SuperAnimalHack\Movement.obj
 C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Source\Features\Camera\CameraModule.cpp;C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\obj\Release\SuperAnimalHack\CameraModule.obj
 C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Source\Features\Misc\Misc.cpp;C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\obj\Release\SuperAnimalHack\Misc.obj
 C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Deps\MinHook\src\buffer.c;C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\obj\Release\SuperAnimalHack\buffer.obj

@@ -12,4 +12,6 @@ public:
 	void Run();
 	void Draw();
 	void DrawWatermark();
+	void DrawFeatureIndicator();
+	void DrawVelocityIndicator();
 };

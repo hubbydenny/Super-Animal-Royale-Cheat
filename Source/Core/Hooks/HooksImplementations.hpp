@@ -88,9 +88,14 @@ void __fastcall HooksDefinitions::HkNetworkPlayerStart(void* pNetworkPlayer, con
 
 	auto* netPlayer = reinterpret_cast<NetworkPlayer*>(pNetworkPlayer);
 
+	if (netPlayer)
 	{
 		std::lock_guard<std::mutex> lock(gpCtx->mtx);
-		gpCtx->players.push_back(netPlayer);
+		auto it = std::find(gpCtx->players.begin(), gpCtx->players.end(), netPlayer);
+		if (it == gpCtx->players.end())
+		{
+			gpCtx->players.push_back(netPlayer);
+		}
 
 		if (!gpCtx->localPlayer)
 		{
@@ -178,16 +183,14 @@ HRESULT __stdcall HooksDefinitions::HkSwapChainPresent(IDXGISwapChain* pSwapChai
 				esp->DrawBoxes();
 				esp->DrawSnaplines();
 				esp->DrawNames();
-				if (cfg.bAimbot)
-				{
-					float cx = ImGui::GetIO().DisplaySize.x * 0.5f;
-					float cy = ImGui::GetIO().DisplaySize.y * 0.5f;
-			//		ImGui::GetBackgroundDrawList()->AddCircle(ImVec2(cx, cy), cfg.fAimFov, IM_COL32(255, 255, 255, 80), 64, 1.0f);
-				}
+				esp->DrawArmor();
+				esp->DrawGrenades();
 				if (gpCtx)
 				{
 					auto* misc = modules->GetModule<MiscModule>(MISC_MODULE_NAME);
 					misc->DrawWatermark();
+					misc->DrawFeatureIndicator();
+					misc->DrawVelocityIndicator();
 				}
 			}
 			ImGui::End();

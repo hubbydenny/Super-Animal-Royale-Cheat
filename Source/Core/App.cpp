@@ -3,7 +3,7 @@
 #include <spdlog/spdlog.h>
 #include "../Features/ESP/EspModule.hpp"
 #include "../Features/Camera/CameraModule.hpp"
-#include "../Features/Bunnyhop/Bunnyhop.hpp"
+#include "../Features/Movement/Movement.hpp"
 #include "../Features/Aimbot/Aimbot.hpp"
 #include "../Features/Misc/Misc.hpp"
 
@@ -24,7 +24,7 @@ void App::AddModules()
 {
 	m_modules.AddModule<EspModule>();
 	m_modules.AddModule<CameraModule>();
-	m_modules.AddModule<BunnyhopModule>();
+	m_modules.AddModule<MovementModule>();
 	m_modules.AddModule<AimbotModule>();
 	m_modules.AddModule<MiscModule>();
 }

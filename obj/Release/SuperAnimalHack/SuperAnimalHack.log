@@ -1,14 +1,45 @@
-﻿  HooksManager.cpp
-C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Source\Core\Hooks\HooksImplementations.hpp(184,12): warning C4189: 'cy': local variable is initialized but not referenced
-  (compiling source file 'Source/Core/Hooks/HooksManager.cpp')
-  
-C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Source\Core\Hooks\HooksImplementations.hpp(183,12): warning C4189: 'cx': local variable is initialized but not referenced
-  (compiling source file 'Source/Core/Hooks/HooksManager.cpp')
-  
+﻿  Aimbot.cpp
+  DllMain.cpp
+  main.cpp
+C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Source\DllMain.cpp(3,59): warning C4100: 'lpvReserved': unreferenced parameter
+  App.cpp
+C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Source\Core\App.cpp(36,8): warning C4189: 'context': local variable is initialized but not referenced
+  Menu.cpp
+  ModulesManager.cpp
+  NopBuffer.cpp
+  PatternScanner.cpp
+  LogManager.cpp
+  HooksManager.cpp
   EspModule.cpp
+  Movement.cpp
+  CameraModule.cpp
+  Misc.cpp
+  imgui.cpp
+  imgui_demo.cpp
+  imgui_draw.cpp
+  imgui_impl_dx11.cpp
+  imgui_impl_win32.cpp
+  imgui_stdlib.cpp
+  Compiling...
+  imgui_tables.cpp
+  imgui_widgets.cpp
+  buffer.c
+C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Deps\MinHook\src\buffer.c(49,6): warning C4201: nonstandard extension used: nameless struct/union
+  hook.c
+C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Deps\MinHook\src\hook.c(377,44): warning C4310: cast truncates constant value
+C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Deps\MinHook\src\hook.c(393,26): warning C4244: '=': conversion from 'BOOL' to 'UINT8', possible loss of data
+C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Deps\MinHook\src\hook.c(394,26): warning C4244: '=': conversion from 'BOOL' to 'UINT8', possible loss of data
+C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Deps\MinHook\src\hook.c(568,52): warning C4244: '=': conversion from 'BOOL' to 'UINT8', possible loss of data
+C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Deps\MinHook\src\hook.c(748,49): warning C4244: '=': conversion from 'BOOL' to 'UINT8', possible loss of data
+C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Deps\MinHook\src\hook.c(755,51): warning C4244: '=': conversion from 'BOOL' to 'UINT8', possible loss of data
+  trampoline.c
+C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Deps\MinHook\src\trampoline.c(281,19): warning C4244: '+=': conversion from 'UINT' to 'UINT8', possible loss of data
+  hde32.c
+C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\Deps\MinHook\src\hde\hde32.c(327,1): warning C4206: nonstandard extension used: translation unit is empty
+  hde64.c
   Generating code
-  3 of 6189 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+  1 of 8334 functions (<0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    25 functions had inline decision re-evaluated but remain unchanged
+    31 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   SuperAnimalHack.vcxproj -> C:\Users\warp\Downloads\SuperAnimalHack-main\SuperAnimalHack-main\bin\Release\SuperAnimalHack.dll
