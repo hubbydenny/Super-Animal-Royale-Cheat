@@ -1,2 +1,2 @@
 #todolist 
-1.make prediction for Aimbot
+- [x] 1. make prediction for Aimbot

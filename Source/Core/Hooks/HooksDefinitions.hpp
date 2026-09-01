@@ -33,15 +33,15 @@ namespace HooksDefinitions
 	
 	constexpr const char* ASSEMBLY_NAME = "GameAssembly.dll";
 
-	constexpr const char* PATTERN_NETWORK_PLAYER_DESTROY = "";
-	constexpr const char* PATTERN_NETWORK_PLAYER_START   = "";
+	constexpr const char* PATTERN_NETWORK_PLAYER_DESTROY = "48 89 5C 24 10 57 48 83 EC 20 80 3D ? ? ? ? 00 48 8B D9 75 43";
+	constexpr const char* PATTERN_NETWORK_PLAYER_START   = "48 89 5C 24 10 57 48 83 EC 40 80 3D ? ? ? ? 00 48 8B D9 75 43";
 	constexpr const char* PATTERN_WORLD_TO_SCREEN_POINT  = "48 89 5C 24 08 57 48 83 EC 40 F2 41 0F 10 00 33 C0 48 89 01 48 8B FA";
-	constexpr const char* PATTERN_LOCAL_PLAYER_START      = "";
+	constexpr const char* PATTERN_LOCAL_PLAYER_START     = "40 57 41 55 48 83 EC 78 80 3D ? ? ? ? 00 48 8B F9 75 67";
 
-	inline uintptr_t offsetNetworkPlayerDestroy = 0x14A5620;
-	inline uintptr_t offsetNetworkPlayerStart = 0x14ADBE0;
-	inline uintptr_t offsetWorldToScreenPoint = 0x2DDEB50;
-	inline uintptr_t offsetLocalPlayerStart = 0x10540D0;
+	inline uintptr_t offsetNetworkPlayerDestroy = 0x16B6F00;
+	inline uintptr_t offsetNetworkPlayerStart   = 0x16BF4C0;
+	inline uintptr_t offsetWorldToScreenPoint  = 0x2EF74A0;
+	inline uintptr_t offsetLocalPlayerStart    = 0x1642000;
 	//
 
 	HRESULT __stdcall HkResizeBuffers(IDXGISwapChain* pSwapChain, const UINT BufferCount, const UINT Width, const UINT Height, const DXGI_FORMAT NewFormat, const UINT SwapChainFlags);

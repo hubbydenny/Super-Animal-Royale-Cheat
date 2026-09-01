@@ -34,9 +34,6 @@
     <Filter Include="Source\Features\ESP">
       <UniqueIdentifier>{8C6F7B23-4D9E-5A01-B2C3-D4E5F6010004}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Features\Bunnyhop">
-      <UniqueIdentifier>{8C6F7B23-4D9E-5A01-B2C3-D4E5F6010005}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source\Features\Camera">
       <UniqueIdentifier>{8C6F7B23-4D9E-5A01-B2C3-D4E5F6010006}</UniqueIdentifier>
     </Filter>
@@ -73,6 +70,9 @@
     <Filter Include="Source\Features\Menu\Fonts">
       <UniqueIdentifier>{ae3c010b-e12c-4a3d-badb-8f5ab173b5de}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Features\Movement">
+      <UniqueIdentifier>{8C6F7B23-4D9E-5A01-B2C3-D4E5F6010005}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\DllMain.cpp">
@@ -101,9 +101,6 @@
     </ClCompile>
     <ClCompile Include="Source\Features\ESP\EspModule.cpp">
       <Filter>Source\Features\ESP</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Features\Bunnyhop\Bunnyhop.cpp">
-      <Filter>Source\Features\Bunnyhop</Filter>
     </ClCompile>
     <ClCompile Include="Source\Features\Camera\CameraModule.cpp">
       <Filter>Source\Features\Camera</Filter>
@@ -156,6 +153,9 @@
     <ClCompile Include="Deps\ImGui\imgui_widgets.cpp">
       <Filter>Deps\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Features\Movement\Movement.cpp">
+      <Filter>Source\Features\Movement</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\main.hpp">
@@ -199,9 +199,6 @@
     </ClInclude>
     <ClInclude Include="Source\Features\ESP\EspModule.hpp">
       <Filter>Source\Features\ESP</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Features\Bunnyhop\Bunnyhop.hpp">
-      <Filter>Source\Features\Bunnyhop</Filter>
     </ClInclude>
     <ClInclude Include="Source\Features\Camera\CameraModule.hpp">
       <Filter>Source\Features\Camera</Filter>
@@ -268,6 +265,9 @@
     </ClInclude>
     <ClInclude Include="Source\Features\Menu\fonts\RubikFont.h">
       <Filter>Source\Features\Menu\fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Features\Movement\Movement.hpp">
+      <Filter>Source\Features\Movement</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

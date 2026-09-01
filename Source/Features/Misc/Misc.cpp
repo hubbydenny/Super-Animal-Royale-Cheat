@@ -6,29 +6,82 @@
 
 extern GameContext* gpCtx;
 
-//main
 MiscModule::MiscModule(ModulesManager* const modules, HooksManager* const hooks, Config& cfg)
 	: ModuleBase(MISC_MODULE_NAME, modules, hooks, cfg)
 {
-};
+}
 
 void MiscModule::Run()
 {
+	UpdateWeaponBooleans();
+	RunRapidFire();
 }
-void MiscModule::DrawWatermark() {
+
+void MiscModule::UpdateWeaponBooleans()
+{
+	cfg.is_weapon  = false;
+	cfg.is_ak47    = false;
+	cfg.is_m16     = false;
+	cfg.is_smg     = false;
+	cfg.is_shotgun = false;
+	cfg.is_sniper  = false;
+	cfg.is_heavy   = false;
+	cfg.is_melee   = false;
+
+	if (!gpCtx) return;
+
+	NetworkPlayer* localNet = nullptr;
+	{
+		std::lock_guard<std::mutex> lock(gpCtx->mtx);
+		if (!gpCtx->localPlayer || !gpCtx->localPlayer->player) return;
+		localNet = gpCtx->localPlayer->player;
+	}
+	if (!localNet) return;
+
+	cfg.is_weapon = PlayerIsHoldingGun(localNet);
+	cfg.is_melee  = PlayerIsHoldingMelee(localNet);
+}
+
+void MiscModule::RunRapidFire()
+{
+	if (!cfg.bRapidFire || !cfg.kbRapidFire.UpdateState()) return;
+	if (!gpCtx) return;
+
+	NetworkPlayer* localNet = nullptr;
+	{
+		std::lock_guard<std::mutex> lock(gpCtx->mtx);
+		if (!gpCtx->localPlayer || !gpCtx->localPlayer->player) return;
+		localNet = gpCtx->localPlayer->player;
+	}
+	if (!localNet) return;
+
+	if (!IsBadWritePtr(&localNet->lastAttackTime, sizeof(ACTkObscuredFloat)))
+	{
+		WriteObscuredFloat(localNet->lastAttackTime, 0.0f);
+	}
+
+	if (!IsBadWritePtr(&localNet->lastAttackTimeMelee, sizeof(float)))
+	{
+		localNet->lastAttackTimeMelee = 0.0f;
+	}
+}
+
+void MiscModule::DrawWatermark()
+{
 	if (!gpCtx) return;
 	ImDrawList* DrawList = ImGui::GetForegroundDrawList();
-	if (DrawList) {
-		float fps = ImGui::GetIO().Framerate;
-		char buf[64];
-		snprintf(buf, sizeof(buf), "larparius | fps: %.0f", fps);
-		ImVec2 pos(1760.0f, 20.0f);
-		ImVec2 textSize = ImGui::CalcTextSize(buf);
-		ImVec2 rectMin = ImVec2(pos.x - 12.0f, pos.y - 6.0f);
-		ImVec2 rectMax = ImVec2(pos.x + textSize.x + 12.0f, pos.y + textSize.y + 6.0f);
-		DrawList->AddRectFilled(rectMin, rectMax, IM_COL32(0, 0, 0, 255), 0.0f);
-		DrawList->AddText(pos, IM_COL32(165, 233, 100, 200), buf);
-	}
+	if (!DrawList) return;
+
+	float fps = ImGui::GetIO().Framerate;
+	char buf[128];
+	snprintf(buf, sizeof(buf), "larparius | fps: %.0f", fps);
+
+	ImVec2 pos(1760.0f, 20.0f);
+	ImVec2 textSize = ImGui::CalcTextSize(buf);
+	ImVec2 rectMin  = ImVec2(pos.x - 12.0f, pos.y - 6.0f);
+	ImVec2 rectMax  = ImVec2(pos.x + textSize.x + 12.0f, pos.y + textSize.y + 6.0f);
+	DrawList->AddRectFilled(rectMin, rectMax, IM_COL32(0, 0, 0, 200), 4.0f);
+	DrawList->AddText(pos, IM_COL32(165, 233, 100, 200), buf);
 }
 
 void MiscModule::DrawFeatureIndicator()
@@ -42,50 +95,70 @@ void MiscModule::DrawFeatureIndicator()
 
 	std::vector<ActiveFeature> features;
 
-	if (cfg.bAimbot && cfg.kbAim.UpdateState()) {
-		features.push_back({ "Aimbot", "ON" });
+	if (cfg.bAimbot && cfg.kbAim.UpdateState())
+	{
+		static const char* modeNames[] = { "Closest", "LowestHP", "HighestHP", "MostKills" };
+		int m = cfg.iAimbotMode;
+		if (m < 0 || m > 3) m = 0;
+		features.push_back({ "Aimbot", modeNames[m] });
 	}
 
-	if (cfg.bEsp && cfg.kbEsp.UpdateState()) {
+	if (cfg.bRapidFire && cfg.kbRapidFire.UpdateState())
+		features.push_back({ "Rapid Fire", cfg.fRapidFireMultiplier == 0.0f ? "Instant" : "ON" });
+
+	if (cfg.bChams && cfg.kbChams.UpdateState())
+		features.push_back({ "Chams", cfg.bChamsThroughWalls ? "Walls" : "ON" });
+
+	if (cfg.bEsp && cfg.kbEsp.UpdateState())
+	{
 		std::string espSub;
-		if (cfg.bBoxes && cfg.kbBoxes.UpdateState()) espSub += "Box ";
-		if (cfg.bNames && cfg.kbNames.UpdateState()) espSub += "Name ";
+		if (cfg.bBoxes    && cfg.kbBoxes.UpdateState())    espSub += "Box ";
+		if (cfg.bNames    && cfg.kbNames.UpdateState())    espSub += "Name ";
 		if (cfg.bSnaplines && cfg.kbSnaplines.UpdateState()) espSub += "Snap ";
-		if (cfg.bArrows && cfg.kbArrows.UpdateState()) espSub += "Arrow ";
+		if (cfg.bArrows   && cfg.kbArrows.UpdateState())   espSub += "Arrow ";
 		if (cfg.bArmorEsp && cfg.kbArmorEsp.UpdateState()) espSub += "Armor ";
 		if (cfg.bGrenadeEsp && cfg.kbGrenadeEsp.UpdateState()) espSub += "Nade ";
-
 		if (espSub.empty()) espSub = "ON";
 		features.push_back({ "Visuals (ESP)", espSub });
 	}
 
-	if (cfg.bBhop && cfg.kbBhop.UpdateState()) {
+	if (cfg.bBhop && cfg.kbBhop.UpdateState())
 		features.push_back({ "Bunnyhop", "ON" });
-	}
 
-	if (cfg.bFastParachute && cfg.kbFastParachute.UpdateState()) {
+	if (cfg.bFastParachute && cfg.kbFastParachute.UpdateState())
 		features.push_back({ "Fast Parachute", "ON" });
-	}
 
-	if (cfg.bVehicleFly && cfg.kbVehicleFly.UpdateState()) {
+	if (cfg.bVehicleFly && cfg.kbVehicleFly.UpdateState())
 		features.push_back({ "Vehicle Fly", "ON" });
-	}
 
-	if (cfg.bZoomOverride) {
+	if (cfg.bZoomOverride)
 		features.push_back({ "Zoom Hack", "ON" });
-	}
 
-	if (cfg.bDisableMoveAnim && cfg.kbDisableMoveAnim.UpdateState()) {
+	if (cfg.bDisableMoveAnim && cfg.kbDisableMoveAnim.UpdateState())
 		features.push_back({ "No Move Anim", "ON" });
+
+	if (cfg.is_weapon || cfg.is_melee)
+	{
+		const char* wn = cfg.is_ak47    ? "AK47"
+		               : cfg.is_m16     ? "M16"
+		               : cfg.is_smg     ? "SMG"
+		               : cfg.is_shotgun ? "Shotgun"
+		               : cfg.is_sniper  ? "Sniper"
+		               : cfg.is_heavy   ? "Heavy"
+		               : cfg.is_melee   ? "Melee"
+		               : "Gun";
+		features.push_back({ "Weapon", wn });
 	}
 
 	ImGui::SetNextWindowSizeConstraints(ImVec2(190.0f, 0.0f), ImVec2(340.0f, 600.0f));
-	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse;
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar
+		| ImGuiWindowFlags_AlwaysAutoResize
+		| ImGuiWindowFlags_NoCollapse;
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 8.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(12.0f, 8.0f));
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.08f, 0.09f, 0.11f, 0.85f));
-	ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.647f, 0.914f, 0.392f, 0.60f));
+	ImGui::PushStyleColor(ImGuiCol_Border,   ImVec4(0.647f, 0.914f, 0.392f, 0.60f));
 
 	if (ImGui::Begin("##ActiveFeaturesOverlay", nullptr, flags))
 	{
@@ -126,9 +199,9 @@ void MiscModule::DrawVelocityIndicator()
 	}
 	if (!localNet) return;
 
-	static Vector2 s_lastPos = { 0.0f, 0.0f };
-	static float s_smoothedVel = 0.0f;
-	static ULONGLONG s_lastTimeMs = 0;
+	static Vector2   s_lastPos     = { 0.0f, 0.0f };
+	static float     s_smoothedVel = 0.0f;
+	static ULONGLONG s_lastTimeMs  = 0;
 
 	ULONGLONG now = GetTickCount64();
 	if (s_lastTimeMs == 0)
@@ -143,8 +216,8 @@ void MiscModule::DrawVelocityIndicator()
 	{
 		s_lastTimeMs = now;
 		Vector2 curPos = localNet->previousPosition;
-		float dx = curPos.x - s_lastPos.x;
-		float dy = curPos.y - s_lastPos.y;
+		float dx  = curPos.x - s_lastPos.x;
+		float dy  = curPos.y - s_lastPos.y;
 		float dist = std::sqrtf(dx * dx + dy * dy);
 		float rawVel = (dist / dt) * 15.0f;
 		s_smoothedVel = s_smoothedVel * 0.75f + rawVel * 0.25f;
@@ -160,9 +233,11 @@ void MiscModule::DrawVelocityIndicator()
 	char velText[32];
 	snprintf(velText, sizeof(velText), "%d", (int)s_smoothedVel);
 
-	ImFont* font = ImGui::GetFont();
-	float fontSize = 34.0f;
-	ImVec2 textSize = font ? font->CalcTextSizeA(fontSize, FLT_MAX, 0.0f, velText) : ImGui::CalcTextSize(velText);
+	ImFont* font     = ImGui::GetFont();
+	float   fontSize = 34.0f;
+	ImVec2 textSize  = font
+		? font->CalcTextSizeA(fontSize, FLT_MAX, 0.0f, velText)
+		: ImGui::CalcTextSize(velText);
 
 	float posX = (screenW - textSize.x) * 0.5f;
 	float posY = screenH * 0.72f;
@@ -174,19 +249,17 @@ void MiscModule::DrawVelocityIndicator()
 	dl->AddRectFilled(barMin, barMax, IM_COL32(0, 0, 0, 220));
 
 	for (int xo = -2; xo <= 2; xo++)
-	{
 		for (int yo = -2; yo <= 2; yo++)
 		{
 			if (xo == 0 && yo == 0) continue;
 			if (font)
-				dl->AddText(font, fontSize, ImVec2(posX + xo, posY + yo), IM_COL32(0, 0, 0, 230), velText);
+				dl->AddText(font, fontSize, ImVec2(posX + xo, posY + yo), IM_COL32(0,0,0,230), velText);
 			else
-				dl->AddText(ImVec2(posX + xo, posY + yo), IM_COL32(0, 0, 0, 230), velText);
+				dl->AddText(ImVec2(posX + xo, posY + yo), IM_COL32(0,0,0,230), velText);
 		}
-	}
 
 	if (font)
-		dl->AddText(font, fontSize, ImVec2(posX, posY), IM_COL32(255, 255, 255, 255), velText);
+		dl->AddText(font, fontSize, ImVec2(posX, posY), IM_COL32(255,255,255,255), velText);
 	else
-		dl->AddText(ImVec2(posX, posY), IM_COL32(255, 255, 255, 255), velText);
+		dl->AddText(ImVec2(posX, posY), IM_COL32(255,255,255,255), velText);
 }

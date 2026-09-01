@@ -155,14 +155,72 @@ static void DrawTabAimbot(Config& cfg)
 	ImGui::SameLine();
 	ImGui::Text("Enable Aimbot");
 	DrawBindGear("aimbot", cfg.kbAim);
+
 	if (cfg.bAimbot)
 	{
 		ImGui::Indent(24.0f);
-		ImGui::Text("Max Target Distance");
 		ImGui::PushItemWidth(200.0f);
+
+		ImGui::Checkbox("Silent Aim (Direct Angle)", &cfg.bSilentAim);
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Sets weapon angle directly in memory without moving cursor");
+
+		ImGui::Checkbox("Draw FOV Circle", &cfg.bAimFovCircle);
+		if (cfg.bAimFovCircle)
+		{
+			ImGui::SameLine();
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
+			ImGui::ColorEdit4("##colFovCircle", cfg.colFovCircle.data(), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+			ImGui::PopStyleVar();
+		}
+
+		ImGui::Spacing();
+		ImGui::Text("Target Mode");
+		const char* modeItems[] = { "Closest", "Lowest HP", "Highest HP", "Most Kills" };
+		ImGui::Combo("##aimbotmode", &cfg.iAimbotMode, modeItems, IM_ARRAYSIZE(modeItems));
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("How the aimbot picks its target");
+
+		ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Spacing();
+
+		ImGui::Text("Max Target Distance / FOV");
 		ImGui::SliderFloat("##aimdist", &cfg.fAimFov, 10.0f, 2000.0f, "%.0f");
 		if (ImGui::IsItemHovered())
 			ImGui::SetTooltip("Maximum distance to target in world units");
+
+		ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Spacing();
+
+		ImGui::Text("Target Filters");
+		ImGui::Checkbox("Only aim when holding weapon", &cfg.bAimOnlyWhenWeapon);
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Skip aiming if local player has no gun equipped");
+		ImGui::Checkbox("Ignore sniper/bow targets", &cfg.bAimIgnoreSniper);
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Skip targets that are holding a sniper or bow");
+
+		ImGui::Spacing();
+		ImGui::Separator();
+		ImGui::Spacing();
+
+		ImGui::Checkbox("Target Prediction", &cfg.bAimPrediction);
+		if (cfg.bAimPrediction)
+		{
+			ImGui::Indent(16.0f);
+			ImGui::Text("Prediction Scale Factor");
+			ImGui::SliderFloat("##predfactor", &cfg.fAimPredictionFactor, 0.1f, 3.0f, "%.2f");
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Multiplier for lead distance estimation");
+
+			ImGui::Text("Estimated Bullet Speed");
+			ImGui::SliderFloat("##bulletspeed", &cfg.fAimBulletSpeed, 100.0f, 3000.0f, "%.0f");
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Projectile travel speed for lead time calculation");
+			ImGui::Unindent(16.0f);
+		}
 
 		ImGui::PopItemWidth();
 		ImGui::Unindent(24.0f);
@@ -175,14 +233,41 @@ static void DrawTabVisuals(Config& cfg)
 	ImGui::SameLine();
 	ImGui::Text("Enable Visuals");
 	DrawBindGear("esp", cfg.kbEsp);
-	
-	if (cfg.bEsp)
+
+	ImGui::Spacing();
+	ImGui::Checkbox("##chams_en", &cfg.bChams);
+	ImGui::SameLine();
+	ImGui::Text("Chams");
+	DrawBindGear("chams", cfg.kbChams);
+	if (cfg.bChams)
+	{
+		ImGui::Indent(24.0f);
+		ImGui::Checkbox("Enemy only", &cfg.bChamsEnemyOnly);
+		ImGui::Checkbox("Through walls", &cfg.bChamsThroughWalls);
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(2, 2));
+		ImGui::ColorEdit4("##colChamsEnemy",    cfg.colChamsEnemy.data(),
+			ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+		ImGui::SameLine(); ImGui::Text("Enemy");
+		ImGui::SameLine(0, 16);
+		ImGui::ColorEdit4("##colChamsFriendly", cfg.colChamsFriendly.data(),
+			ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+		ImGui::SameLine(); ImGui::Text("Friendly");
+		ImGui::PopStyleVar();
+		ImGui::Unindent(24.0f);
+	}
+	ImGui::Spacing();
+	ImGui::Separator();
+	ImGui::Spacing();
+
 	{
 		if (ImGui::BeginChild("##visuals_scroll", ImVec2(0, 360.f), ImGuiChildFlags_None, ImGuiWindowFlags_NoBackground))
 		{
 			ImGui::Indent(24.0f);
 			ImGui::Checkbox("Boxes", &cfg.bBoxes);
 			DrawBindGear("boxes", cfg.kbBoxes);
+
+			ImGui::Checkbox("Skeleton ESP", &cfg.bSkeletonEsp);
+			DrawBindGear("skeleton", cfg.kbSkeleton);
 
 			ImGui::Checkbox("Snap Lines", &cfg.bSnaplines);
 			DrawBindGear("snaplines", cfg.kbSnaplines);
@@ -206,13 +291,20 @@ static void DrawTabVisuals(Config& cfg)
 			ImGui::ColorEdit4("##colBox", cfg.colBox.data(), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_NoAlpha);
 			ImGui::SameLine(); ImGui::Text("Box");
 			ImGui::SameLine(0, 16);
+			ImGui::ColorEdit4("##colSkeleton", cfg.colSkeleton.data(), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_NoAlpha);
+			ImGui::SameLine(); ImGui::Text("Skeleton");
+
 			ImGui::ColorEdit4("##colName", cfg.colName.data(), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_NoAlpha);
 			ImGui::SameLine(); ImGui::Text("Name");
+			ImGui::SameLine(0, 16);
 			ImGui::ColorEdit4("##colArmor", cfg.colArmor.data(), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_NoAlpha);
 			ImGui::SameLine(); ImGui::Text("Armor");
-			ImGui::SameLine(0, 16);
+
 			ImGui::ColorEdit4("##colNade", cfg.colGrenade.data(), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_NoAlpha);
 			ImGui::SameLine(); ImGui::Text("Nade");
+			ImGui::SameLine(0, 16);
+			ImGui::ColorEdit4("##colFovCircle", cfg.colFovCircle.data(), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+			ImGui::SameLine(); ImGui::Text("FOV Circle");
 			ImGui::PopStyleVar();
 			ImGui::Separator();
 
@@ -223,7 +315,7 @@ static void DrawTabVisuals(Config& cfg)
 			{
 				ImGui::Indent(24.0f);
 				ImGui::PushItemWidth(200.0f);
-				ImGui::SliderFloat("##zoomval", &cfg.fZoomOverrideValue, 67.6f, 400.f, "%.1f");
+				ImGui::SliderFloat("##zoomval", &cfg.fZoomOverrideValue, 15.0f, 500.0f, "%.1f");
 				ImGui::PopItemWidth();
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip("Player Fov");
@@ -349,6 +441,26 @@ static void DrawTabPlayers(GameContext& ctx, Config& cfg)
 
 static void DrawTabMisc(Config& cfg)
 {
+	// ---- Rapid Fire ----
+	ImGui::Checkbox("##rapidfire_en", &cfg.bRapidFire);
+	ImGui::SameLine();
+	ImGui::Text("Rapid Fire");
+	DrawBindGear("rapidfire", cfg.kbRapidFire);
+	if (cfg.bRapidFire)
+	{
+		ImGui::Indent(24.0f);
+		ImGui::PushItemWidth(200.0f);
+		ImGui::Text("Fire Rate Multiplier (0 = instant)");
+		ImGui::SliderFloat("##rfmult", &cfg.fRapidFireMultiplier, 0.0f, 1.0f, "%.2f");
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("0 = instant re-fire, 1 = original rate");
+		ImGui::PopItemWidth();
+		ImGui::Unindent(24.0f);
+	}
+
+	ImGui::Spacing();
+
+	// ---- Feature Indicator ----
 	ImGui::Checkbox("##featurelist_en", &cfg.bFeatureList);
 	ImGui::SameLine();
 	ImGui::Text("Feature Indicator");
@@ -358,6 +470,7 @@ static void DrawTabMisc(Config& cfg)
 	ImGui::Separator();
 	ImGui::Spacing();
 
+	// ---- Velocity Indicator ----
 	ImGui::Checkbox("##velocity_en", &cfg.bVelocityIndicator);
 	ImGui::SameLine();
 	ImGui::Text("Velocity Indicator");
@@ -366,10 +479,27 @@ static void DrawTabMisc(Config& cfg)
 
 static void DrawTabMovement(Config& cfg)
 {
+	ImGui::Checkbox("##antibanana_en", &cfg.bAntiBanana);
+	ImGui::SameLine();
+	ImGui::Text("Anti-Banana / Auto Stun Reset");
+	DrawBindGear("antibanana", cfg.kbAntiBanana);
+	ImGui::Spacing();
+
+	ImGui::Checkbox("##infroll_en", &cfg.bInfiniteRoll);
+	ImGui::SameLine();
+	ImGui::Text("Infinite Roll (No Cooldown)");
+	DrawBindGear("infroll", cfg.kbInfiniteRoll);
+	ImGui::Spacing();
+
 	ImGui::Checkbox("##bhop_en", &cfg.bBhop);
 	ImGui::SameLine();
 	ImGui::Text("Jump Boost");
 	DrawBindGear("Jb", cfg.kbBhop);
+	ImGui::Spacing();
+
+	ImGui::Checkbox("##vehicle_boost", &cfg.bVehicleBoost);
+	ImGui::SameLine();
+	ImGui::Text("Emu & Hamster Ball Speed Boost");
 	ImGui::Spacing();
 
 	ImGui::Checkbox("##fast_parachute", &cfg.bFastParachute);

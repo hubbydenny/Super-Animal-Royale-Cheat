@@ -22,6 +22,30 @@ void MovementModule::Run()
 	}
 	if (!localNet) return;
 
+	if (cfg.bAntiBanana && cfg.kbAntiBanana.UpdateState())
+	{
+		localNet->bananaStunStartTime = 0.0f;
+		localNet->bananaStunEndTime = 0.0f;
+		if (localNet->currentWalkMode == EWalkMode::BananaStun)
+			localNet->currentWalkMode = EWalkMode::Normal;
+		if (localScript)
+		{
+			localScript->lastServerPositionForBananaStun = localScript->lastServerPosition;
+		}
+	}
+
+	if (cfg.bInfiniteRoll && cfg.kbInfiniteRoll.UpdateState())
+	{
+		localNet->rollEndTime = 0.0f;
+		localNet->rollStartTime = 0.0f;
+		localNet->didHitBunnyHopRoll = true;
+		localNet->bunnyHopCurrentBonus = 1.0f;
+		if (localNet->currentWalkMode == EWalkMode::Roll)
+		{
+			localNet->currentWalkMode = EWalkMode::Normal;
+		}
+	}
+
 	if (cfg.bBhop && cfg.kbBhop.UpdateState())
 	{
 		bool spaceDown = (GetAsyncKeyState(VK_SPACE) & 0x8000) != 0;
@@ -51,8 +75,20 @@ void MovementModule::Run()
 	{
 		float speed = cfg.fVehicleFlySpeed * 0.016f;
 		if (GetAsyncKeyState('W') & 0x8000) localNet->currentPosition.y += speed;
-		if (GetAsyncKeyState('S') & 0x8000) localNet->currentPosition.y += speed;
-		if (GetAsyncKeyState('A') & 0x8000) localNet->currentPosition.x += speed;
+		if (GetAsyncKeyState('S') & 0x8000) localNet->currentPosition.y -= speed;
+		if (GetAsyncKeyState('A') & 0x8000) localNet->currentPosition.x -= speed;
 		if (GetAsyncKeyState('D') & 0x8000) localNet->currentPosition.x += speed;
+	}
+
+	if (cfg.bVehicleBoost)
+	{
+		if (localNet->currentWalkMode == EWalkMode::Vehicle)
+		{
+			float boostSpeed = cfg.fVehicleFlySpeed * 0.03f;
+			if (GetAsyncKeyState('W') & 0x8000) localNet->currentPosition.y += boostSpeed;
+			if (GetAsyncKeyState('S') & 0x8000) localNet->currentPosition.y -= boostSpeed;
+			if (GetAsyncKeyState('A') & 0x8000) localNet->currentPosition.x -= boostSpeed;
+			if (GetAsyncKeyState('D') & 0x8000) localNet->currentPosition.x += boostSpeed;
+		}
 	}
 }

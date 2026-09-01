@@ -14,4 +14,11 @@ public:
 	void DrawWatermark();
 	void DrawFeatureIndicator();
 	void DrawVelocityIndicator();
+
+	// RapidFire: zeroes fire-rate cooldown on local player's active weapon each frame
+	void RunRapidFire();
+
+	// Weapon boolean update: refreshes cfg.is_weapon / is_ak47 / etc. each frame
+	void UpdateWeaponBooleans();
 };
+ 

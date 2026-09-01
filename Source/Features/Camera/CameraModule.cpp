@@ -13,43 +13,20 @@ void CameraModule::Run()
 	
 	if (ctx.localPlayer && ctx.localPlayer->player)
 	{
-		if (cfg.bZoomOverride)
+		auto netPlayer = ctx.localPlayer->player;
+		if (!IsBadReadPtr(netPlayer, sizeof(NetworkPlayer)))
 		{
-			if (!pCameraOrtho)
+			auto gc = netPlayer->gameCamera;
+			if (gc && !IsBadReadPtr(gc, sizeof(GameCamera)))
 			{
-				auto gc = ctx.localPlayer->player->gameCamera;
-			if (gc)
+				if (cfg.bZoomOverride)
 				{
-					pCameraOrtho = &gc->mainOrthoSize;
-#ifdef _DEBUG
-					spdlog::debug("CameraModule: cached ortho ptr {:p}", (void*)pCameraOrtho);
-#endif
+					if (cfg.fZoomOverrideValue >= 10.0f && cfg.fZoomOverrideValue <= 1000.0f)
+					{
+						gc->mainOrthoSize = cfg.fZoomOverrideValue;
+					}
 				}
 			}
-
-			if (pCameraOrtho)
-			{
-				*pCameraOrtho = cfg.fZoomOverrideValue;
-			}
-		}
-		else
-		{
-			if (pCameraOrtho)
-			{
-				*pCameraOrtho = cfg.fZoomDefaultValue;
-				pCameraOrtho = nullptr;
-			}
-		}
-	}
-	else
-	{
-		if (pCameraOrtho)
-		{
-#ifdef _DEBUG
-			spdlog::debug("CameraModule: localPlayer gone, resetting ortho");
-#endif
-			*pCameraOrtho = cfg.fZoomDefaultValue;
-			pCameraOrtho = nullptr;
 		}
 	}
 }

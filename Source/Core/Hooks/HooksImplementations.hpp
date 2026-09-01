@@ -178,16 +178,26 @@ HRESULT __stdcall HooksDefinitions::HkSwapChainPresent(IDXGISwapChain* pSwapChai
 				DrawMenu(cfg, *gpCtx, context.bMenuOpen);
 
 				auto* const esp = modules->GetModule<EspModule>(ESP_MODULE_NAME);
+				auto* misc = modules->GetModule<MiscModule>(MISC_MODULE_NAME);
+
+				// ---- Feature Updates ----
+				if (misc)
+				{
+					misc->RunRapidFire();
+					misc->UpdateWeaponBooleans();
+				}
 
 				esp->DrawArrows();
 				esp->DrawBoxes();
 				esp->DrawSnaplines();
+				esp->DrawSkeleton();
 				esp->DrawNames();
 				esp->DrawArmor();
 				esp->DrawGrenades();
-				if (gpCtx)
+				esp->DrawChams();
+
+				if (misc)
 				{
-					auto* misc = modules->GetModule<MiscModule>(MISC_MODULE_NAME);
 					misc->DrawWatermark();
 					misc->DrawFeatureIndicator();
 					misc->DrawVelocityIndicator();

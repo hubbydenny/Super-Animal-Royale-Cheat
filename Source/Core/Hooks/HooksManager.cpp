@@ -55,11 +55,12 @@ void HooksManager::Init(ModulesManager * modules)
 	};
 
 	WorldToScreenPoint    = reinterpret_cast<T_WorldToScreenPoint>(resolve(PATTERN_WORLD_TO_SCREEN_POINT, offsetWorldToScreenPoint));
-	// pLocalPlayerStart     = reinterpret_cast<T_LocalPlayerStart>(resolve(PATTERN_LOCAL_PLAYER_START, offsetLocalPlayerStart));
+	pLocalPlayerStart     = reinterpret_cast<T_LocalPlayerStart>(resolve(PATTERN_LOCAL_PLAYER_START, offsetLocalPlayerStart));
 	pNetworkPlayerStart   = reinterpret_cast<T_NetworkPlayerStart>(resolve(PATTERN_NETWORK_PLAYER_START, offsetNetworkPlayerStart));
 	pNetworkPlayerDestroy = reinterpret_cast<T_NetworkPlayerDestroy>(resolve(PATTERN_NETWORK_PLAYER_DESTROY, offsetNetworkPlayerDestroy));
 
 	spdlog::info("WorldToScreenPoint    = 0x{:X}", reinterpret_cast<uintptr_t>(WorldToScreenPoint));
+	spdlog::info("pLocalPlayerStart     = 0x{:X}", reinterpret_cast<uintptr_t>(pLocalPlayerStart));
 	spdlog::info("pNetworkPlayerStart   = 0x{:X}", reinterpret_cast<uintptr_t>(pNetworkPlayerStart));
 	spdlog::info("pNetworkPlayerDestroy = 0x{:X}", reinterpret_cast<uintptr_t>(pNetworkPlayerDestroy));
 
@@ -69,7 +70,7 @@ void HooksManager::Init(ModulesManager * modules)
 		spdlog::error("Failed to initialize MinHook. Hooks will not be initialized.");
 		return;
 	}
-	spdlog::warn("LocalPlayerStart hook DISABLED - offset 0x10540D0 is incorrect (SimpleJSON method)");
+	CREATE_HOOK(LocalPlayerStart);
 	CREATE_HOOK(NetworkPlayerStart);
 	CREATE_HOOK(NetworkPlayerDestroy);
 	CREATE_HOOK_2(SwapChainPresent);
